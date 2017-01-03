@@ -8,8 +8,8 @@
  * java -jar xml-compare-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/ravi/Desktop/Projects/xml-compare/src/main/resources/XML1.xml /home/ravi/Desktop/Projects/xml-compare/src/main/resources/XML2.xml /home/ravi/Desktop/Projects/xml-compare/src/main/resources/Results2.xls
 
 ### Run as Docker image
- * docker run -p 8084:8080 -v <local path>:/usr/src -t ravikalla/xmlcompare /usr/src/&lt;XML1 in local path> /usr/src/&lt;XML2 in local path> /usr/src/&lt;Results.xls in XML1 in local path>
+ * docker run -p 8084:8080 -v <local path>:/usr/src -t ravikalla/xml-compare /usr/src/&lt;XML1 in local path> /usr/src/&lt;XML2 in local path> /usr/src/&lt;Results.xls in XML1 in local path>
  <br/>
  <br/>
  Eg:
- * docker run -p 8084:8080 -v /home/ravi/Desktop/Projects/xml-compare/src/main/resources:/usr/src -t ravikalla/xmlcompare /usr/src/XML1.xml /usr/src/XML2.xml /usr/src/Results.xls
+ * docker run -p 8084:8080 -v /home/ravi/Desktop/Projects/xml-compare/src/main/resources:/usr/src -t ravikalla/xml-compare /usr/src/XML1.xml /usr/src/XML2.xml /usr/src/Results.xls
