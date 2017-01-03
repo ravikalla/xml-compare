@@ -1,0 +1,55 @@
+2017-01-03 00:48:05 DEBUG CompareXMLAndXML:79 - Start : CompareXMLAndXML.main(...)
+2017-01-03 00:48:05 DEBUG CompareXMLAndXML:104 - Start : CompareXMLAndXML.testCompareXMLAndXML_WriteResults()XML1.xml : XML2.xml
+2017-01-03 00:48:05 DEBUG CompareXMLAndXML:96 - 31 : CompareXMLAndXML.main(...) : IOException e : java.io.FileNotFoundException: XML1.xml (No such file or directory)
+2017-01-03 00:48:05 DEBUG CompareXMLAndXML:98 - End : CompareXMLAndXML.main(...)
+2017-01-03 00:53:36 DEBUG CompareXMLAndXML:79 - Start : CompareXMLAndXML.main(...)
+2017-01-03 00:53:36 DEBUG CompareXMLAndXML:104 - Start : CompareXMLAndXML.testCompareXMLAndXML_WriteResults()/home/ravi/Desktop/Projects/xml-compare/src/main/resources/XML1.xml : /home/ravi/Desktop/Projects/xml-compare/src/main/resources/XML2.xml
+2017-01-03 00:53:36 DEBUG CompareXMLAndXML:197 - Start : CompareXMLAndXML.readTxtFileToList(...)
+2017-01-03 00:53:36 DEBUG CompareXMLAndXML:220 - End : CompareXMLAndXML.readTxtFileToList(...)
+2017-01-03 00:53:36 DEBUG CompareXMLAndXML:136 - Iterative elements length : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:43 - Start : XMLDataConverter.compareXPathElementsData_WithChildElements(...)
+2017-01-03 00:53:36 DEBUG XMLDataConverter:108 - 92 : /Schools/School : 6 : 6
+2017-01-03 00:53:36 DEBUG XMLDataConverter:112 - 96 : 6
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 2 : 2
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:418 - 246 : XMLDataConverter.equal(...) : 1 : 1
+2017-01-03 00:53:36 DEBUG XMLDataConverter:160 - End : XMLDataConverter.compareXPathElementsData_WithChildElements(...)
+2017-01-03 00:53:36 DEBUG CompareXMLAndXML:157 - Mismatched data size : 9
+2017-01-03 00:53:36 DEBUG XMLDataConverter:647 - Start : XMLDataConverter.printResultsToFile(...)
+2017-01-03 00:53:36 DEBUG XMLDataConverter:678 - End : XMLDataConverter.printResultsToFile(...)
+2017-01-03 00:53:36 DEBUG CompareXMLAndXML:120 - End : CompareXMLAndXML.testCompareXMLAndXML_WriteResults()/home/ravi/Desktop/Projects/xml-compare/src/main/resources/XML1.xml : /home/ravi/Desktop/Projects/xml-compare/src/main/resources/XML2.xml : false
+2017-01-03 00:53:36 DEBUG CompareXMLAndXML:98 - End : CompareXMLAndXML.main(...)
