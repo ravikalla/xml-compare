@@ -81,9 +81,9 @@ import in.ravikalla.xml_compare.util.XMLDataConverter;
  * 
  * Docker:
  * =======
- * $ docker build -f Dockerfile -t xmlcompare .
- * $ docker run -p 8084:8080 -v <local path>:/usr/src -t xmlcompare /usr/src/<XML1 in local path> /usr/src/<XML2 in local path> /usr/src/<Results.xls in <XML1 in local path>
- * $ docker run -p 8084:8080 -v /home/ravi/Desktop/Projects/xml-compare/src/main/resources:/usr/src -t xmlcompare /usr/src/XML1.xml /usr/src/XML2.xml /usr/src/Results.xls
+ * $ docker build -f Dockerfile -t ravikalla/xmlcompare .
+ * $ docker run -p 8084:8080 -v <local path>:/usr/src -t ravikalla/xmlcompare /usr/src/<XML1 in local path> /usr/src/<XML2 in local path> /usr/src/<Results.xls in <XML1 in local path>
+ * $ docker run -p 8084:8080 -v /home/ravi/Desktop/Projects/xml-compare/src/main/resources:/usr/src -t ravikalla/xmlcompare /usr/src/XML1.xml /usr/src/XML2.xml /usr/src/Results.xls
  */
 
 public class CompareXMLAndXML {
