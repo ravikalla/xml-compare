@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/ravikalla/xml-compare.svg?branch=master)](https://travis-ci.org/ravikalla/xml-compare)
-[![Code Quality](https://www.codacy.com/app/ravikalla/xml-compare/dashboard)](https://www.codacy.com/app/ravikalla/xml-compare/dashboard)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fb2e5b1e69484d3c979351671a5f7225)](https://www.codacy.com/app/ravikalla/xml-compare?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ravikalla/xml-compare&amp;utm_campaign=Badge_Grade)
 
 # Compare two XMLs and write differences to an Excel
 
