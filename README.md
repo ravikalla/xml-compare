@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/ravikalla/xml-compare.svg?branch=master)](https://travis-ci.org/ravikalla/xml-compare)
+[![Code Quality](https://www.codacy.com/app/ravikalla/xml-compare/dashboard)](https://www.codacy.com/app/ravikalla/xml-compare/dashboard)
+
 # Compare two XMLs and write differences to an Excel
 
 ### Run Java code in local
