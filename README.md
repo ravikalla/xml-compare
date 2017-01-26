@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/ravikalla/xml-compare.svg?branch=master)](https://travis-ci.org/ravikalla/xml-compare)
 # Compare two XMLs and write differences to an Excel
 
 ### Run Java code in local
