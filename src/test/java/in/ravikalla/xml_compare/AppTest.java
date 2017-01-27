@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import in.ravikalla.xml_compare.util.CommonUtil;
-import in.ravikalla.xml_compare.util.XMLDataConverter;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -14,9 +13,8 @@ import junit.framework.TestSuite;
  * Unit test for simple App.
  */
 public class AppTest 
-    extends TestCase
+    extends TestCase {
     private final static Logger logger = Logger.getLogger(AppTest.class);
-{
     /**
      * Create the test case
      *
