@@ -29,26 +29,24 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import in.ravikalla.xml_compare.CompareXMLAndXML;
 import in.ravikalla.xml_compare.dto.SimpleNamespaceContext;
 import in.ravikalla.xml_compare.dto.XMLToXMLComparisonResultsHolderDTO;
 
 public class XMLDataConverter {
-	final static Logger logger = Logger.getLogger(XMLDataConverter.class);
+	private final static Logger logger = Logger.getLogger(XMLDataConverter.class);
 	public static DocumentBuilder builder = null;
 
-	public static XMLToXMLComparisonResultsHolderDTO compareXPathElementsData_WithChildElements(String xmlStr1,
+	public static XMLToXMLComparisonResultsHolderDTO compXPathEleDataWithChildEle(String xmlStr1,
 			String xmlStr2, String strIterativeElement, List<String> lstElementsToExclude, String strPrimaryNodeXMLElementName,
 			String strTrimElements) throws SAXException, IOException, ParserConfigurationException {
-		logger.debug("Start : XMLDataConverter.compareXPathElementsData_WithChildElements(...)");
+		logger.debug("Start : XMLDataConverter.compareXPathElementsDataWithChildElements(...)");
+		XMLToXMLComparisonResultsHolderDTO objXMLToXMLComparisonResultsHolderDTO = new XMLToXMLComparisonResultsHolderDTO();
+
 		List<String> lstMissmatchedDataForCSV = new ArrayList<String>();
 		List<String> lstMatchedDataForCSV = new ArrayList<String>();
-		List<String> lstNodeInformation_Temp = null;
-		int intTempNode2Position = -1;
 		Map<Integer, Integer> mapMatchedNodePositions = new HashMap<Integer, Integer> ();
 		NodeList nodeListRoot1 = null;
 		NodeList nodeListRoot2 = null;
-		Node node1 = null;
 
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xpath1 = xpathFactory.newXPath();
@@ -62,8 +60,8 @@ public class XMLDataConverter {
 		doc2.getDocumentElement().normalize();
 
 		// Compare the data by ignoreCaseSensitive
-		String strCaseSensitiveValues = "";
 		Map<String, String> mapCaseSensitiveValues = new HashMap<String, String>();
+		String strCaseSensitiveValues = "";
 		try {
 			
 			if (null != strTrimElements) {
@@ -79,9 +77,9 @@ public class XMLDataConverter {
 				logger.debug("Map size for mapCaseSensitiveValues : " + mapCaseSensitiveValues.size());
 			}
 		} catch(Exception ex) {
-			logger.error("62 : XMLDataConverter.compareXPathElementsData_WithChildElements(...) : ex : " + ex);
+			logger.error("62 : XMLDataConverter.compareXPathElementsDataWithChildElements(...) : ex : " + ex);
 		}
-		// End : Compare the date by ignore case sensitive
+		// End : Compare the data by ignore case sensitive
 
 		if (null != strTrimElements && !strTrimElements.trim().equals("") && strTrimElements.split(",")[1].equals(";"))
 			strTrimElements = null;
@@ -112,53 +110,74 @@ public class XMLDataConverter {
 			logger.debug("96 : " + nodeListRoot2.getLength());
 
 			// Read content from XML1
-			for (int intElementCtr1 = 0; intElementCtr1 < intElementCount1; intElementCtr1++) {
-
-				// Idetify element from first XML
-				expr1 = xpath1.compile(strIterativeElement + "[" + (intElementCtr1 + 1) + "]");
-				nodeListRoot1 = (NodeList) expr1.evaluate(doc1,  XPathConstants.NODESET);
-				node1 = null;
-				if (nodeListRoot1.getLength() > 0)
-					node1 = nodeListRoot1.item(0);
-				intTempNode2Position = -1;
-				if (null != node1) {
-					if (eligibleNodeForValidation(node1, lstElementsToExclude)) {
-						intTempNode2Position = getPositionOfMatchingNodeFromList(node1, nodeListRoot2, mapMatchedNodePositions, lstElementsToExclude, mapCaseSensitiveValues);
-					}
-					if (-1 != intTempNode2Position) {
-						mapMatchedNodePositions.put(new Integer(intElementCtr1), new Integer(intTempNode2Position));
-					}
-				}
-			}
+			getIterativeElementOccurences(strIterativeElement, lstElementsToExclude, mapMatchedNodePositions,
+					nodeListRoot2, xpath1, doc1, mapCaseSensitiveValues, intElementCount1);
 			expr1 = xpath1.compile(strIterativeElement);
 			nodeListRoot1 = (NodeList) expr1.evaluate(doc1,  XPathConstants.NODESET);
 
 			// Find the mismatched node positions in XML1 and XML2 from the matched positions
-			List<String> lstMatchedElementPositions_ColonSeparated = findMatchedNodePositionsInXML1AndXML2(mapMatchedNodePositions, intElementCount1);
-			List<String> lstMismatchedElementPositions_ColonSeparated = findMismatchedNodePositionsInXML1AndXML2(mapMatchedNodePositions, intElementCount1, intElementCount2);
-			for (String strMismatchedPosition_ColumnSeparated : lstMismatchedElementPositions_ColonSeparated) {
-				lstNodeInformation_Temp = getNodeInformationForMismatchedData(strMismatchedPosition_ColumnSeparated, nodeListRoot1, nodeListRoot2, lstElementsToExclude);
-				if (null != lstNodeInformation_Temp && lstNodeInformation_Temp.size() > 0) {
-					lstMissmatchedDataForCSV.add(",,,"); // Adding empty row before showing next set of nodes
-					lstMissmatchedDataForCSV.addAll(lstNodeInformation_Temp);
-				}
-			}
-			for (String strMatchedPosition_ColSeparated : lstMatchedElementPositions_ColonSeparated) {
-				lstNodeInformation_Temp = getNodeInformationForMatchedData(strMatchedPosition_ColSeparated, nodeListRoot1);
-				if (null != lstNodeInformation_Temp && lstNodeInformation_Temp.size() > 0) {
-					lstMatchedDataForCSV.add(",,,"); // Adding empty row before showing next set of nodes
-					lstMatchedDataForCSV.addAll(lstNodeInformation_Temp);
-				}
-			}
+			getMatchedAndMismatchedDataForCSV(lstElementsToExclude, objXMLToXMLComparisonResultsHolderDTO,
+					lstMissmatchedDataForCSV, lstMatchedDataForCSV, mapMatchedNodePositions, nodeListRoot1,
+					nodeListRoot2, intElementCount1, intElementCount2);
 		} catch (XPathExpressionException e) {
-			logger.error("140 : XMLDataConverter.compareXPathElementsData_WithChildElements(...) : XPathExpressionException e : " + e);
+			logger.error("140 : XMLDataConverter.compareXPathElementsDataWithChildElements(...) : XPathExpressionException e : " + e);
 		}
-		XMLToXMLComparisonResultsHolderDTO objXMLToXMLComparisonResultsHolderDTO = new XMLToXMLComparisonResultsHolderDTO();
+
+		logger.debug("End : XMLDataConverter.compareXPathElementsDataWithChildElements(...)");
+		return objXMLToXMLComparisonResultsHolderDTO;
+	}
+
+	private static void getMatchedAndMismatchedDataForCSV(List<String> lstElementsToExclude,
+			XMLToXMLComparisonResultsHolderDTO objXMLToXMLComparisonResultsHolderDTO,
+			List<String> lstMissmatchedDataForCSV, List<String> lstMatchedDataForCSV,
+			Map<Integer, Integer> mapMatchedNodePositions, NodeList nodeListRoot1, NodeList nodeListRoot2,
+			int intElementCount1, int intElementCount2) {
+		List<String> lstMatchedElementPositions_ColonSeparated = findMatchedNodePositionsInXML1AndXML2(mapMatchedNodePositions, intElementCount1);
+		List<String> lstMismatchedElementPositions_ColonSeparated = findMismatchedNodePositionsInXML1AndXML2(mapMatchedNodePositions, intElementCount1, intElementCount2);
+		List<String> lstNodeInformation_Temp = null;
+		for (String strMismatchedPosition_ColumnSeparated : lstMismatchedElementPositions_ColonSeparated) {
+			lstNodeInformation_Temp = getNodeInformationForMismatchedData(strMismatchedPosition_ColumnSeparated, nodeListRoot1, nodeListRoot2, lstElementsToExclude);
+			if (null != lstNodeInformation_Temp && lstNodeInformation_Temp.size() > 0) {
+				lstMissmatchedDataForCSV.add(",,,"); // Adding empty row before showing next set of nodes
+				lstMissmatchedDataForCSV.addAll(lstNodeInformation_Temp);
+			}
+		}
+		for (String strMatchedPosition_ColSeparated : lstMatchedElementPositions_ColonSeparated) {
+			lstNodeInformation_Temp = getNodeInformationForMatchedData(strMatchedPosition_ColSeparated, nodeListRoot1);
+			if (null != lstNodeInformation_Temp && lstNodeInformation_Temp.size() > 0) {
+				lstMatchedDataForCSV.add(",,,"); // Adding empty row before showing next set of nodes
+				lstMatchedDataForCSV.addAll(lstNodeInformation_Temp);
+			}
+		}
 		objXMLToXMLComparisonResultsHolderDTO.lstMatchedDataForCSV = lstMatchedDataForCSV;
 		objXMLToXMLComparisonResultsHolderDTO.lstMismatchedDataForCSV = lstMissmatchedDataForCSV;
+	}
 
-		logger.debug("End : XMLDataConverter.compareXPathElementsData_WithChildElements(...)");
-		return objXMLToXMLComparisonResultsHolderDTO;
+	private static void getIterativeElementOccurences(String strIterativeElement, List<String> lstElementsToExclude,
+			Map<Integer, Integer> mapMatchedNodePositions, NodeList nodeListRoot2, XPath xpath1, Document doc1,
+			Map<String, String> mapCaseSensitiveValues, int intElementCount1) throws XPathExpressionException {
+		int intTempNode2Position;
+		NodeList nodeListRoot1;
+		Node node1;
+		XPathExpression expr1;
+		for (int intElementCtr1 = 0; intElementCtr1 < intElementCount1; intElementCtr1++) {
+
+			// Idetify element from first XML
+			expr1 = xpath1.compile(strIterativeElement + "[" + (intElementCtr1 + 1) + "]");
+			nodeListRoot1 = (NodeList) expr1.evaluate(doc1,  XPathConstants.NODESET);
+			node1 = null;
+			if (nodeListRoot1.getLength() > 0)
+				node1 = nodeListRoot1.item(0);
+			intTempNode2Position = -1;
+			if (null != node1) {
+				if (eligibleNodeForValidation(node1, lstElementsToExclude)) {
+					intTempNode2Position = getPositionOfMatchingNodeFromList(node1, nodeListRoot2, mapMatchedNodePositions, lstElementsToExclude, mapCaseSensitiveValues);
+				}
+				if (-1 != intTempNode2Position) {
+					mapMatchedNodePositions.put(new Integer(intElementCtr1), new Integer(intTempNode2Position));
+				}
+			}
+		}
 	}
 
 	private static List<String> getNodeInformationForMatchedData(String strMatchedPosition_ColSeparated,
@@ -281,11 +300,9 @@ public class XMLDataConverter {
 				if (objEntry.getValue().intValue() == intTempPos)
 					blnElementFoundInXML2 = true;
 			}
-			if (!blnElementFoundInXML1)
-				if (intTempPos < intElementCount1)
+			if ((!blnElementFoundInXML1) && (intTempPos < intElementCount1))
 					lstMismatchedPositionsInXML1.add((new Integer(intTempPos)).toString());
-			if (!blnElementFoundInXML2)
-				if (intTempPos < intElementCount2)
+			if ((!blnElementFoundInXML2) && (intTempPos < intElementCount2))
 					lstMismatchedPositionsInXML2.add((new Integer(intTempPos)).toString());
 		}
 		for (int intTempPos = 0; intTempPos < lstMismatchedPositionsInXML1.size(); intTempPos++) {
@@ -310,8 +327,7 @@ public class XMLDataConverter {
 				if (objEntry.getKey().intValue() == intTempPos)
 					blnElementFoundInXML1 = true;
 			}
-			if (blnElementFoundInXML1)
-				if (intTempPos < intElementCount1)
+			if ((blnElementFoundInXML1) && (intTempPos < intElementCount1))
 					lstMatchedPositionsInXML1.add((new Integer(intTempPos)).toString());
 		}
 		for (int intTempPos = 0; intTempPos < lstMatchedPositionsInXML1.size(); intTempPos++) {
@@ -329,13 +345,11 @@ public class XMLDataConverter {
 			Map<String, String> mapIgnoreCaseSensitiveValues) {
 		int intPositionOfMatchingNodeFromList = -1;
 		for (int intNodePositionInLst2 = 0; intNodePositionInLst2 < nodeListRoot2.getLength(); intNodePositionInLst2++) {
-			if (!isNumberPresentInMapValue(intNodePositionInLst2, mapMatchedNodePositions)) {
-				if (eligibleNodeForValidation(nodeListRoot2.item(intNodePositionInLst2), lstElementsToExclude)) {
-					if (equal(node1, nodeListRoot2.item(intNodePositionInLst2), lstElementsToExclude, mapIgnoreCaseSensitiveValues)) {
+			if ((!isNumberPresentInMapValue(intNodePositionInLst2, mapMatchedNodePositions))
+				&& (eligibleNodeForValidation(nodeListRoot2.item(intNodePositionInLst2), lstElementsToExclude))
+					&& (equal(node1, nodeListRoot2.item(intNodePositionInLst2), lstElementsToExclude, mapIgnoreCaseSensitiveValues))) {
 						intPositionOfMatchingNodeFromList = intNodePositionInLst2;
 						break;
-					}
-				}
 			}
 		}
 		return intPositionOfMatchingNodeFromList;
@@ -344,31 +358,57 @@ public class XMLDataConverter {
 	private static boolean equal(Node node1, Node node2, List<String> lstElementsToExclude,
 			Map<String, String> mapIgnoreCaseSensitive) {
 		boolean isEqual = true;
-		int node1Ctr, node2Ctr;
 		List<Integer> lstMatchedPositionsInSecondList = new ArrayList<Integer> ();
 
 		if ((node1.getNodeType() == node2.getNodeType()) && (node1.getNodeName().equals(node2.getNodeName()))) {
 			if (node1.getNodeType() == Node.TEXT_NODE || node1.getNodeType() == Node.ATTRIBUTE_NODE) {
+				isEqual = equalTextOrAttributeNodes(node1, node2, mapIgnoreCaseSensitive, isEqual);
+			}
+			else { // if the node is not text or attribute node
+				isEqual = equalNonTextOrAttributeNodes(node1, node2, lstElementsToExclude, mapIgnoreCaseSensitive,
+						isEqual, lstMatchedPositionsInSecondList);
+			}
+		}
+		else
+			isEqual = false;
+		return isEqual;
+	}
+
+	private static boolean equalNonTextOrAttributeNodes(Node node1, Node node2, List<String> lstElementsToExclude,
+			Map<String, String> mapIgnoreCaseSensitive, boolean isEqual,
+			List<Integer> lstMatchedPositionsInSecondList) {
+		int node1Ctr;
+		int node2Ctr;
+		List<Node> lst1 = getChildrenWithoutTextNodesIfComplex(node1, lstElementsToExclude);
+		List<Node> lst2 = getChildrenWithoutTextNodesIfComplex(node2, lstElementsToExclude);
+		logger.debug("246 : XMLDataConverter.equal(...) : " + lst1.size() + " : " + lst2.size());
+		if (lst1.size() == lst2.size() && lst1.isEmpty() && lst2.isEmpty()) {
+			NodeList childNodes1 = node1.getChildNodes();
+			NodeList childNodes2 = node2.getChildNodes();
+			if (null != childNodes1 && childNodes1.getLength() > 0 && null != childNodes2 && childNodes2.getLength() > 0) {
+				logger.debug("Child Nodes Length : " + childNodes1.getLength() + " : " + childNodes2.getLength());
+				if (childNodes1.getLength() != childNodes2.getLength())
+					isEqual = false;
+			}
+			else {
 				String strYesNo = "No";
 				if (null != mapIgnoreCaseSensitive) {
-					String strpath = Util_XMLConvert.getCompletePathForANode(node1).substring(0, Util_XMLConvert.getCompletePathForANode(node1).lastIndexOf("/"));
-					strYesNo = mapIgnoreCaseSensitive.get(strpath);
+					String strPath = Util_XMLConvert.getCompletePathForANode(node1).substring(0,  Util_XMLConvert.getCompletePathForANode(node1).lastIndexOf("/"));
+					strYesNo = mapIgnoreCaseSensitive.get(strPath);
 				}
 
 				if (null != strYesNo && strYesNo.equalsIgnoreCase("Yes")) {
-					if (node1.getTextContent().trim().equalsIgnoreCase(node2.getTextContent().trim())) {
+					if (node1.getTextContent().trim().equalsIgnoreCase(node2.getTextContent().trim()))
 						isEqual = true;
-					}
-					else {
+					else
 						isEqual = false;
-					}
 				} else if (null != strYesNo && (strYesNo.startsWith("<")
-					|| strYesNo.startsWith(">")
-					|| strYesNo.startsWith("Value")
-					|| strYesNo.startsWith("Between"))) {
-//					If Node2(Actual XML content) matches the criteria move to matched tab in excel
+						|| strYesNo.startsWith(">")
+						|| strYesNo.startsWith("Value")
+						|| strYesNo.startsWith("Between"))) {
 					String equalityCond[] = strYesNo.split(",");
-					if (node2.getTextContent() != null && !node2.getTextContent().trim().equals("")) {
+					if (node1.getTextContent() != null && !node1.getTextContent().trim().equals("")) {
+						// TODO : Check this logic
 						switch (equalityCond[0]) {
 						case "<":
 							Double nodeVal = Double.parseDouble(node2.getTextContent().trim());
@@ -403,6 +443,8 @@ public class XMLDataConverter {
 							else
 								isEqual = false;
 							break;
+						default:
+							break;
 						}
 					}
 				} else {
@@ -412,122 +454,113 @@ public class XMLDataConverter {
 						isEqual = false;
 				}
 			}
-			else { // if the node is not text or attribute node
-				List<Node> lst1 = getChildrenWithoutTextNodesIfComplex(node1, lstElementsToExclude);
-				List<Node> lst2 = getChildrenWithoutTextNodesIfComplex(node2, lstElementsToExclude);
-				logger.debug("246 : XMLDataConverter.equal(...) : " + lst1.size() + " : " + lst2.size());
-				if (lst1.size() == lst2.size() && lst1.isEmpty() && lst2.isEmpty()) {
-					NodeList childNodes1 = node1.getChildNodes();
-					NodeList childNodes2 = node2.getChildNodes();
-					if (null != childNodes1 && childNodes1.getLength() > 0 && null != childNodes2 && childNodes2.getLength() > 0) {
-						logger.debug("Child Nodes Length : " + childNodes1.getLength() + " : " + childNodes2.getLength());
-						if (childNodes1.getLength() != childNodes2.getLength())
-							isEqual = false;
-					}
-					else {
-						String strYesNo = "No";
-						if (null != mapIgnoreCaseSensitive) {
-							String strPath = Util_XMLConvert.getCompletePathForANode(node1).substring(0,  Util_XMLConvert.getCompletePathForANode(node1).lastIndexOf("/"));
-							strYesNo = mapIgnoreCaseSensitive.get(strPath);
-						}
-
-						if (null != strYesNo && strYesNo.equalsIgnoreCase("Yes")) {
-							if (node1.getTextContent().trim().equalsIgnoreCase(node2.getTextContent().trim()))
-								isEqual = true;
+		}
+		if (lst1.size() != lst2.size())
+			isEqual = false;
+		else {
+			Node node1_child = null;
+			Node node2_child = null;
+			int intDoNotCompareElementCnt = 0;
+			for (node1Ctr = 0; node1Ctr < lst1.size(); node1Ctr++) {
+				node1_child = lst1.get(node1Ctr);
+				if (eligibleNodeForValidation(node1_child, lstElementsToExclude)) {
+					boolean blnNodeMatchFound = false;
+					for (node2Ctr = 0; node2Ctr < lst2.size(); node2Ctr++) {
+						node2_child = lst2.get(node2Ctr);
+						if (eligibleNodeForValidation(node2_child, lstElementsToExclude)) {
+							if (isAlreadyMatchedNode(lstMatchedPositionsInSecondList, node2Ctr))
+								continue;
 							else
-								isEqual = false;
-						} else if (null != strYesNo && (strYesNo.startsWith("<")
-								|| strYesNo.startsWith(">")
-								|| strYesNo.startsWith("Value")
-								|| strYesNo.startsWith("Between"))) {
-							String equalityCond[] = strYesNo.split(",");
-							if (node1.getTextContent() != null && !node1.getTextContent().trim().equals("")) {
-								// TODO : Check this logic
-								switch (equalityCond[0]) {
-								case "<":
-									Double nodeVal = Double.parseDouble(node2.getTextContent().trim());
-									Double inputVal = Double.parseDouble(equalityCond[1].trim());
-									if (nodeVal < inputVal)
-										isEqual = true;
-									else
-										isEqual = false;
-									break;
-								case ">":
-									Double nodeVal1 = Double.parseDouble(node2.getTextContent().trim());
-									Double inputVal1 = Double.parseDouble(equalityCond[1].trim());
-									if (nodeVal1 > inputVal1)
-										isEqual = true;
-									else
-										isEqual = false;
-									break;
-								case "Value":
-									String nodeVal2 = node2.getTextContent().trim();
-									String inputVal2 = equalityCond[1].trim();
-									if (nodeVal2.equals(inputVal2))
-										isEqual = true;
-									else
-										isEqual = false;
-									break;
-								case "Between":
-									Double nodeVal3 = Double.parseDouble(node2.getTextContent().trim());
-									Double inputVal3 = Double.parseDouble(equalityCond[1].trim());
-									Double inputVal4 = Double.parseDouble(equalityCond[2].trim());
-									if (nodeVal3 > inputVal3 && nodeVal3 < inputVal4)
-										isEqual = true;
-									else
-										isEqual = false;
+								if (equal(node1_child, node2_child, lstElementsToExclude, mapIgnoreCaseSensitive)) {
+									lstMatchedPositionsInSecondList.add(new Integer(node2Ctr));
+									blnNodeMatchFound = true;
 									break;
 								}
-							}
-						} else {
-							if (node1.getTextContent().trim().equals(node2.getTextContent().trim()))
-								isEqual = true;
-							else
-								isEqual = false;
 						}
 					}
-				}
-				if (lst1.size() != lst2.size())
-					isEqual = false;
-				else {
-					Node node1_child = null;
-					Node node2_child = null;
-					int intDoNotCompareElementCnt = 0;
-					for (node1Ctr = 0; node1Ctr < lst1.size(); node1Ctr++) {
-						node1_child = lst1.get(node1Ctr);
-						if (eligibleNodeForValidation(node1_child, lstElementsToExclude)) {
-							boolean blnNodeMatchFound = false;
-							for (node2Ctr = 0; node2Ctr < lst2.size(); node2Ctr++) {
-								node2_child = lst2.get(node2Ctr);
-								if (eligibleNodeForValidation(node2_child, lstElementsToExclude)) {
-									if (isAlreadyMatchedNode(lstMatchedPositionsInSecondList, node2Ctr))
-										continue;
-									else
-										if (equal(node1_child, node2_child, lstElementsToExclude, mapIgnoreCaseSensitive)) {
-											lstMatchedPositionsInSecondList.add(new Integer(node2Ctr));
-											blnNodeMatchFound = true;
-											break;
-										}
-								}
-							}
 
 //							If any element from first list is not present in the second list, then there is a mismatch
-							if (!blnNodeMatchFound) {
-								isEqual = false;
-								break;
-							}
-						}
-						else
-							intDoNotCompareElementCnt++;
-					}
-//					If the matched positions count is not same as the number of element in the first child list, then there is a mismatch
-					if ((lstMatchedPositionsInSecondList.size() + intDoNotCompareElementCnt) != lst1.size())
+					if (!blnNodeMatchFound) {
 						isEqual = false;
+						break;
+					}
+				}
+				else
+					intDoNotCompareElementCnt++;
+			}
+//					If the matched positions count is not same as the number of element in the first child list, then there is a mismatch
+			if ((lstMatchedPositionsInSecondList.size() + intDoNotCompareElementCnt) != lst1.size())
+				isEqual = false;
+		}
+		return isEqual;
+	}
+
+	private static boolean equalTextOrAttributeNodes(Node node1, Node node2, Map<String, String> mapIgnoreCaseSensitive,
+			boolean isEqual) {
+		String strYesNo = "No";
+		if (null != mapIgnoreCaseSensitive) {
+			String strpath = Util_XMLConvert.getCompletePathForANode(node1).substring(0, Util_XMLConvert.getCompletePathForANode(node1).lastIndexOf("/"));
+			strYesNo = mapIgnoreCaseSensitive.get(strpath);
+		}
+
+		if (null != strYesNo && strYesNo.equalsIgnoreCase("Yes")) {
+			if (node1.getTextContent().trim().equalsIgnoreCase(node2.getTextContent().trim())) {
+				isEqual = true;
+			}
+			else {
+				isEqual = false;
+			}
+		} else if (null != strYesNo && (strYesNo.startsWith("<")
+			|| strYesNo.startsWith(">")
+			|| strYesNo.startsWith("Value")
+			|| strYesNo.startsWith("Between"))) {
+//					If Node2(Actual XML content) matches the criteria move to matched tab in excel
+			String equalityCond[] = strYesNo.split(",");
+			if (node2.getTextContent() != null && !node2.getTextContent().trim().equals("")) {
+				switch (equalityCond[0]) {
+				case "<":
+					Double nodeVal = Double.parseDouble(node2.getTextContent().trim());
+					Double inputVal = Double.parseDouble(equalityCond[1].trim());
+					if (nodeVal < inputVal)
+						isEqual = true;
+					else
+						isEqual = false;
+					break;
+				case ">":
+					Double nodeVal1 = Double.parseDouble(node2.getTextContent().trim());
+					Double inputVal1 = Double.parseDouble(equalityCond[1].trim());
+					if (nodeVal1 > inputVal1)
+						isEqual = true;
+					else
+						isEqual = false;
+					break;
+				case "Value":
+					String nodeVal2 = node2.getTextContent().trim();
+					String inputVal2 = equalityCond[1].trim();
+					if (nodeVal2.equals(inputVal2))
+						isEqual = true;
+					else
+						isEqual = false;
+					break;
+				case "Between":
+					Double nodeVal3 = Double.parseDouble(node2.getTextContent().trim());
+					Double inputVal3 = Double.parseDouble(equalityCond[1].trim());
+					Double inputVal4 = Double.parseDouble(equalityCond[2].trim());
+					if (nodeVal3 > inputVal3 && nodeVal3 < inputVal4)
+						isEqual = true;
+					else
+						isEqual = false;
+					break;
+				default:
+					break;
 				}
 			}
+		} else {
+			if (node1.getTextContent().trim().equals(node2.getTextContent().trim()))
+				isEqual = true;
+			else
+				isEqual = false;
 		}
-		else
-			isEqual = false;
 		return isEqual;
 	}
 
@@ -553,17 +586,15 @@ public class XMLDataConverter {
 			}
 		}
 		for (int i=0; i<intNodeListLen; i++) {
-			if (isComplex) {
-				if (childNodes.item(i).getNodeType() != Node.TEXT_NODE) {
-					String str = childNodes.item(i).getTextContent();
-					if (str != null && !str.equals("")) {
-						if (eligibleNodeForValidation(childNodes.item(i), lstElementsToExclude))
-							lstChildrenWithoutTextNodes.add(childNodes.item(i));
-					}
+			if ((isComplex)
+					&& (childNodes.item(i).getNodeType() != Node.TEXT_NODE)) {
+				String str = childNodes.item(i).getTextContent();
+				if ((str != null && !str.equals(""))
+					&& (eligibleNodeForValidation(childNodes.item(i), lstElementsToExclude))) {
+						lstChildrenWithoutTextNodes.add(childNodes.item(i));
 				}
 			}
-			else
-				if (eligibleNodeForValidation(childNodes.item(i), lstElementsToExclude))
+			else if (eligibleNodeForValidation(childNodes.item(i), lstElementsToExclude))
 					lstChildrenWithoutTextNodes.add(childNodes.item(i));
 		}
 		return lstChildrenWithoutTextNodes;
@@ -618,8 +649,7 @@ public class XMLDataConverter {
 					String strNodeName = mapNamedNode.item(intCtr).getNodeName();
 					String[] arrNameSpace = strNodeName.toLowerCase().split(":");
 					if (arrNameSpace.length > 1
-							&& arrNameSpace[0].trim().toLowerCase()
-								.equalsIgnoreCase("xmlns")) {
+							&& arrNameSpace[0].trim().equalsIgnoreCase("xmlns")) {
 						String strNameSpaceKey = null;
 						if (arrNameSpace.length > 1)
 							strNameSpaceKey = arrNameSpace[1];
@@ -673,7 +703,16 @@ public class XMLDataConverter {
 			workbook.write(fileOut);
 			fileOut.close();
 		} catch (Exception e) {
-			logger.error("676 : XMLDataConverter.printResultsToFile(...) : " + e);
+			logger.error("706 : XMLDataConverter.printResultsToFile(...) : " + e);
+		}
+		finally {
+			if (null != workbook) {
+				try {
+					workbook.close();
+				} catch (IOException e) {
+					logger.error("713 : XMLDataConverter.printResultsToFile(...) : IOException e : " + e);
+				}
+			}
 		}
 		logger.debug("End : XMLDataConverter.printResultsToFile(...)");
 	}

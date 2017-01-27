@@ -15,10 +15,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import in.ravikalla.xml_compare.CompareXMLAndXML;
-
 public class ConvertXMLToFullPathInCSV {
-	final static Logger logger = Logger.getLogger(ConvertXMLToFullPathInCSV.class);
+	private final static Logger logger = Logger.getLogger(ConvertXMLToFullPathInCSV.class);
 	public static List<String> getFirstLevelOfReapeatingElements(String strXML1, String strXML2) {
 		List<Node> lstResultNodes = null;
 		List<String> lstResultNodeNames_Temp = new ArrayList<String>();

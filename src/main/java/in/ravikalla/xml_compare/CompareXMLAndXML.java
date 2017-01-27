@@ -87,7 +87,7 @@ import in.ravikalla.xml_compare.util.XMLDataConverter;
  */
 
 public class CompareXMLAndXML {
-	final static Logger logger = Logger.getLogger(CompareXMLAndXML.class);
+	private final static Logger logger = Logger.getLogger(CompareXMLAndXML.class);
 
 	public static void main(String[] args) {
 		logger.debug("Start : CompareXMLAndXML.main(...)");
@@ -104,7 +104,7 @@ public class CompareXMLAndXML {
 			strComparisonResultsFile = args[2];
 		}
 		try {
-			testCompareXMLAndXML_WriteResults(strXMLFileName1, strXMLFileName2, strExcludeElementsFileName,
+			testCompareXMLAndXMLWriteResults(strXMLFileName1, strXMLFileName2, strExcludeElementsFileName,
 					strIterateElementsFileName, strComparisonResultsFile, strTrimElements);
 		} catch (IOException e) {
 			logger.error("31 : CompareXMLAndXML.main(...) : IOException e : " + e);
@@ -112,10 +112,10 @@ public class CompareXMLAndXML {
 		logger.debug("End : CompareXMLAndXML.main(...)");
 	}
 
-	public static boolean testCompareXMLAndXML_WriteResults(String strXMLFileName1, String strXMLFileName2,
+	public static boolean testCompareXMLAndXMLWriteResults(String strXMLFileName1, String strXMLFileName2,
 			String strExcludeElementsFileName, String strIterateElementsFileName, String strComparisonResultsFile,
 			String strTrimElements) throws IOException {
-		logger.debug("Start : CompareXMLAndXML.testCompareXMLAndXML_WriteResults()" + strXMLFileName1 + " : " + strXMLFileName2);
+		logger.debug("Start : CompareXMLAndXML.testCompareXMLAndXMLWriteResults()" + strXMLFileName1 + " : " + strXMLFileName2);
 		String xmlStr1 = CommonUtil.readDataFromFile(strXMLFileName1);
 		String xmlStr2 = CommonUtil.readDataFromFile(strXMLFileName2);
 		List<String> lstElementsToExclude = readTxtFileToList(strExcludeElementsFileName);
@@ -126,15 +126,15 @@ public class CompareXMLAndXML {
 		else
 			lstIterativeElements = ConvertXMLToFullPathInCSV.getFirstLevelOfReapeatingElements(xmlStr1, xmlStr2);
 
-		boolean testResult = CompareXMLAndXML.compareXMLAndXML_WriteResults(
+		boolean testResult = CompareXMLAndXML.compareXMLAndXMLWriteResults(
 				strComparisonResultsFile, xmlStr1, xmlStr2,
 				lstIterativeElements, lstElementsToExclude,
 				strPrimaryNodeXMLElementName, strTrimElements
 				);
-		logger.debug("End : CompareXMLAndXML.testCompareXMLAndXML_WriteResults()" + strXMLFileName1 + " : " + strXMLFileName2 + " : " + testResult);
+		logger.debug("End : CompareXMLAndXML.testCompareXMLAndXMLWriteResults()" + strXMLFileName1 + " : " + strXMLFileName2 + " : " + testResult);
 		return testResult;
 	}
-	public static boolean compareXMLAndXML_WriteResults(String strComparisonResultsFile, String xmlStr1,
+	public static boolean compareXMLAndXMLWriteResults(String strComparisonResultsFile, String xmlStr1,
 			String xmlStr2, List<String> lstIterativeElements, List<String> lstElementsToExclude,
 			String strPrimaryNodeXMLElementName, String strTrimElements) {
 		xmlStr1 = replaceEscapes(xmlStr1);
@@ -156,9 +156,9 @@ public class CompareXMLAndXML {
 
 			for (int intCtr = 0; intCtr < lstIterativeElements.size(); intCtr++) {
 				String strIterationElement = lstIterativeElements.get(intCtr);
-				if (!strIterationElement.equals("")) {
+				if (!"".equals(strIterationElement)) {
 					objXMLToXMLComparisonResultsHolderDTO = XMLDataConverter
-							.compareXPathElementsData_WithChildElements(
+							.compXPathEleDataWithChildEle(
 									xmlStr1, xmlStr2,
 									lstIterativeElements.get(intCtr),
 									lstElementsToExclude,
@@ -173,11 +173,11 @@ public class CompareXMLAndXML {
 				blnDifferencesExists = true;
 			XMLDataConverter.printResultsToFile(strComparisonResultsFile, lstMatchedDataForCSV, lstMismatchedDataForCSV);
 		} catch (SAXException e) {
-			logger.error("79 : CompareXMLAndXML.compareXMLAndXML_WriteResults(...) : SAXException e : " + e);
+			logger.error("79 : CompareXMLAndXML.CompareXMLAndXMLWriteResults(...) : SAXException e : " + e);
 		} catch (IOException e) {
-			logger.error("81 : CompareXMLAndXML.compareXMLAndXML_WriteResults(...) : IOException e : " + e);
+			logger.error("81 : CompareXMLAndXML.CompareXMLAndXMLWriteResults(...) : IOException e : " + e);
 		} catch (ParserConfigurationException e) {
-			logger.error("83 : CompareXMLAndXML.compareXMLAndXML_WriteResults(...) : ParserConfigurationException e : " + e);
+			logger.error("83 : CompareXMLAndXML.CompareXMLAndXMLWriteResults(...) : ParserConfigurationException e : " + e);
 		}
 		return !blnDifferencesExists;
 	}

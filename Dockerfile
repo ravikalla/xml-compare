@@ -1,4 +1,7 @@
 FROM java:8
+
+LABEL maintainer "ravi2523096@yahoo.com"
+
 EXPOSE 8080
 VOLUME ["/usr/src", "/usr/src/myapp"]
 ADD /target/xml-compare-0.0.1-SNAPSHOT-jar-with-dependencies.jar /usr/src/myapp/xml-compare-0.0.1-SNAPSHOT-jar-with-dependencies.jar
