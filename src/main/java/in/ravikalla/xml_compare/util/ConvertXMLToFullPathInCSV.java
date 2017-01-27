@@ -151,9 +151,7 @@ public class ConvertXMLToFullPathInCSV {
 
 	private static boolean isLeafNode(Node objNonRepeatingNode) {
 		NodeList lst = objNonRepeatingNode.getChildNodes();
-		if ((lst.getLength() == 1) && (lst.item(0).getNodeType() == Node.TEXT_NODE))
-			return true;
-		return false;
+		return ((lst.getLength() == 1) && (lst.item(0).getNodeType() == Node.TEXT_NODE));
 	}
 
 	private static List<Node> getNonRepeatedNodes(NodeList objNodeList, List<Node> lstRepeatingNodes) {

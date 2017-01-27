@@ -126,6 +126,9 @@ public class CompareXMLAndXML {
 		else
 			lstIterativeElements = ConvertXMLToFullPathInCSV.getFirstLevelOfReapeatingElements(xmlStr1, xmlStr2);
 
+		xmlStr1 = replaceEscapes(xmlStr1);
+		xmlStr2 = replaceEscapes(xmlStr2);
+
 		boolean testResult = CompareXMLAndXML.compareXMLAndXMLWriteResults(
 				strComparisonResultsFile, xmlStr1, xmlStr2,
 				lstIterativeElements, lstElementsToExclude,
@@ -134,12 +137,9 @@ public class CompareXMLAndXML {
 		logger.debug("End : CompareXMLAndXML.testCompareXMLAndXMLWriteResults()" + strXMLFileName1 + " : " + strXMLFileName2 + " : " + testResult);
 		return testResult;
 	}
-	public static boolean compareXMLAndXMLWriteResults(String strComparisonResultsFile, String xmlStr1,
+	private static boolean compareXMLAndXMLWriteResults(String strComparisonResultsFile, String xmlStr1,
 			String xmlStr2, List<String> lstIterativeElements, List<String> lstElementsToExclude,
 			String strPrimaryNodeXMLElementName, String strTrimElements) {
-		xmlStr1 = replaceEscapes(xmlStr1);
-		xmlStr2 = replaceEscapes(xmlStr2);
-
 		printParametersOfXMLtoXMLComparison(strComparisonResultsFile, xmlStr1,
 				xmlStr2, lstIterativeElements, lstElementsToExclude,
 				strPrimaryNodeXMLElementName, strTrimElements);
@@ -203,9 +203,9 @@ public class CompareXMLAndXML {
 		}
 	}
 	private static String replaceEscapes(String xmlStr) {
-		xmlStr = xmlStr.replaceAll("&lt;", "<").replaceAll("<\\?.*?\\?>", "");
-		xmlStr = xmlStr.replaceAll("&gt;", ">").replaceAll("<\\?.*?\\?>", "");
-		return xmlStr;
+		String xmlStr_Local = xmlStr.replaceAll("&lt;", "<").replaceAll("<\\?.*?\\?>", "");
+		xmlStr_Local = xmlStr_Local.replaceAll("&gt;", ">").replaceAll("<\\?.*?\\?>", "");
+		return xmlStr_Local;
 	}
 	private static List<String> readTxtFileToList(String strFileName) {
 		logger.debug("Start : CompareXMLAndXML.readTxtFileToList(...)");

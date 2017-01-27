@@ -39,6 +39,7 @@ public class XMLDataConverter {
 	public static XMLToXMLComparisonResultsHolderDTO compXPathEleDataWithChildEle(String xmlStr1,
 			String xmlStr2, String strIterativeElement, List<String> lstElementsToExclude, String strPrimaryNodeXMLElementName,
 			String strTrimElements) throws SAXException, IOException, ParserConfigurationException {
+		String strTrimElements_Local = strTrimElements;
 		logger.debug("Start : XMLDataConverter.compareXPathElementsDataWithChildElements(...)");
 		XMLToXMLComparisonResultsHolderDTO objXMLToXMLComparisonResultsHolderDTO = new XMLToXMLComparisonResultsHolderDTO();
 
@@ -64,14 +65,14 @@ public class XMLDataConverter {
 		String strCaseSensitiveValues = "";
 		try {
 			
-			if (null != strTrimElements) {
-				String[] arrTrimElements = strTrimElements.split("&&");
+			if (null != strTrimElements_Local) {
+				String[] arrTrimElements = strTrimElements_Local.split("&&");
 				if (arrTrimElements.length > 1) {
-					strTrimElements = arrTrimElements[0];
+					strTrimElements_Local = arrTrimElements[0];
 					strCaseSensitiveValues = arrTrimElements[1];
 				}
-				if (null != strTrimElements && strTrimElements.equals(""))
-					strTrimElements = null;
+				if (null != strTrimElements_Local && strTrimElements_Local.equals(""))
+					strTrimElements_Local = null;
 				mapCaseSensitiveValues = Util_XMLConvert.convertTrimmableElementsToMap(strCaseSensitiveValues, ";", ",");
 
 				logger.debug("Map size for mapCaseSensitiveValues : " + mapCaseSensitiveValues.size());
@@ -81,10 +82,10 @@ public class XMLDataConverter {
 		}
 		// End : Compare the data by ignore case sensitive
 
-		if (null != strTrimElements && !strTrimElements.trim().equals("") && strTrimElements.split(",")[1].equals(";"))
-			strTrimElements = null;
+		if (null != strTrimElements_Local && !strTrimElements_Local.trim().equals("") && strTrimElements_Local.split(",")[1].equals(";"))
+			strTrimElements_Local = null;
 
-		Map<String, String> mapTrimElements = Util_XMLConvert.convertTrimmableElementsToMap(strTrimElements, ";", ",");
+		Map<String, String> mapTrimElements = Util_XMLConvert.convertTrimmableElementsToMap(strTrimElements_Local, ";", ",");
 		NodeList lstChildNodeList1 = doc1.getChildNodes();
 		Util_XMLConvert.trimValueIfApplicable(lstChildNodeList1, mapTrimElements);
 		NodeList lstChildNodeList2 = doc2.getChildNodes();
@@ -377,6 +378,7 @@ public class XMLDataConverter {
 	private static boolean equalNonTextOrAttributeNodes(Node node1, Node node2, List<String> lstElementsToExclude,
 			Map<String, String> mapIgnoreCaseSensitive, boolean isEqual,
 			List<Integer> lstMatchedPositionsInSecondList) {
+		boolean isEqual_Local = isEqual;
 		int node1Ctr;
 		int node2Ctr;
 		List<Node> lst1 = getChildrenWithoutTextNodesIfComplex(node1, lstElementsToExclude);
@@ -388,7 +390,7 @@ public class XMLDataConverter {
 			if (null != childNodes1 && childNodes1.getLength() > 0 && null != childNodes2 && childNodes2.getLength() > 0) {
 				logger.debug("Child Nodes Length : " + childNodes1.getLength() + " : " + childNodes2.getLength());
 				if (childNodes1.getLength() != childNodes2.getLength())
-					isEqual = false;
+					isEqual_Local = false;
 			}
 			else {
 				String strYesNo = "No";
@@ -399,9 +401,9 @@ public class XMLDataConverter {
 
 				if (null != strYesNo && strYesNo.equalsIgnoreCase("Yes")) {
 					if (node1.getTextContent().trim().equalsIgnoreCase(node2.getTextContent().trim()))
-						isEqual = true;
+						isEqual_Local = true;
 					else
-						isEqual = false;
+						isEqual_Local = false;
 				} else if (null != strYesNo && (strYesNo.startsWith("<")
 						|| strYesNo.startsWith(">")
 						|| strYesNo.startsWith("Value")
@@ -414,34 +416,34 @@ public class XMLDataConverter {
 							Double nodeVal = Double.parseDouble(node2.getTextContent().trim());
 							Double inputVal = Double.parseDouble(equalityCond[1].trim());
 							if (nodeVal < inputVal)
-								isEqual = true;
+								isEqual_Local = true;
 							else
-								isEqual = false;
+								isEqual_Local = false;
 							break;
 						case ">":
 							Double nodeVal1 = Double.parseDouble(node2.getTextContent().trim());
 							Double inputVal1 = Double.parseDouble(equalityCond[1].trim());
 							if (nodeVal1 > inputVal1)
-								isEqual = true;
+								isEqual_Local = true;
 							else
-								isEqual = false;
+								isEqual_Local = false;
 							break;
 						case "Value":
 							String nodeVal2 = node2.getTextContent().trim();
 							String inputVal2 = equalityCond[1].trim();
 							if (nodeVal2.equals(inputVal2))
-								isEqual = true;
+								isEqual_Local = true;
 							else
-								isEqual = false;
+								isEqual_Local = false;
 							break;
 						case "Between":
 							Double nodeVal3 = Double.parseDouble(node2.getTextContent().trim());
 							Double inputVal3 = Double.parseDouble(equalityCond[1].trim());
 							Double inputVal4 = Double.parseDouble(equalityCond[2].trim());
 							if (nodeVal3 > inputVal3 && nodeVal3 < inputVal4)
-								isEqual = true;
+								isEqual_Local = true;
 							else
-								isEqual = false;
+								isEqual_Local = false;
 							break;
 						default:
 							break;
@@ -449,14 +451,14 @@ public class XMLDataConverter {
 					}
 				} else {
 					if (node1.getTextContent().trim().equals(node2.getTextContent().trim()))
-						isEqual = true;
+						isEqual_Local = true;
 					else
-						isEqual = false;
+						isEqual_Local = false;
 				}
 			}
 		}
 		if (lst1.size() != lst2.size())
-			isEqual = false;
+			isEqual_Local = false;
 		else {
 			Node node1_child = null;
 			Node node2_child = null;
@@ -481,7 +483,7 @@ public class XMLDataConverter {
 
 //							If any element from first list is not present in the second list, then there is a mismatch
 					if (!blnNodeMatchFound) {
-						isEqual = false;
+						isEqual_Local = false;
 						break;
 					}
 				}
@@ -490,13 +492,14 @@ public class XMLDataConverter {
 			}
 //					If the matched positions count is not same as the number of element in the first child list, then there is a mismatch
 			if ((lstMatchedPositionsInSecondList.size() + intDoNotCompareElementCnt) != lst1.size())
-				isEqual = false;
+				isEqual_Local = false;
 		}
-		return isEqual;
+		return isEqual_Local;
 	}
 
 	private static boolean equalTextOrAttributeNodes(Node node1, Node node2, Map<String, String> mapIgnoreCaseSensitive,
 			boolean isEqual) {
+		boolean isEqual_Local = isEqual;
 		String strYesNo = "No";
 		if (null != mapIgnoreCaseSensitive) {
 			String strpath = Util_XMLConvert.getCompletePathForANode(node1).substring(0, Util_XMLConvert.getCompletePathForANode(node1).lastIndexOf("/"));
@@ -505,10 +508,10 @@ public class XMLDataConverter {
 
 		if (null != strYesNo && strYesNo.equalsIgnoreCase("Yes")) {
 			if (node1.getTextContent().trim().equalsIgnoreCase(node2.getTextContent().trim())) {
-				isEqual = true;
+				isEqual_Local = true;
 			}
 			else {
-				isEqual = false;
+				isEqual_Local = false;
 			}
 		} else if (null != strYesNo && (strYesNo.startsWith("<")
 			|| strYesNo.startsWith(">")
@@ -522,34 +525,34 @@ public class XMLDataConverter {
 					Double nodeVal = Double.parseDouble(node2.getTextContent().trim());
 					Double inputVal = Double.parseDouble(equalityCond[1].trim());
 					if (nodeVal < inputVal)
-						isEqual = true;
+						isEqual_Local = true;
 					else
-						isEqual = false;
+						isEqual_Local = false;
 					break;
 				case ">":
 					Double nodeVal1 = Double.parseDouble(node2.getTextContent().trim());
 					Double inputVal1 = Double.parseDouble(equalityCond[1].trim());
 					if (nodeVal1 > inputVal1)
-						isEqual = true;
+						isEqual_Local = true;
 					else
-						isEqual = false;
+						isEqual_Local = false;
 					break;
 				case "Value":
 					String nodeVal2 = node2.getTextContent().trim();
 					String inputVal2 = equalityCond[1].trim();
 					if (nodeVal2.equals(inputVal2))
-						isEqual = true;
+						isEqual_Local = true;
 					else
-						isEqual = false;
+						isEqual_Local = false;
 					break;
 				case "Between":
 					Double nodeVal3 = Double.parseDouble(node2.getTextContent().trim());
 					Double inputVal3 = Double.parseDouble(equalityCond[1].trim());
 					Double inputVal4 = Double.parseDouble(equalityCond[2].trim());
 					if (nodeVal3 > inputVal3 && nodeVal3 < inputVal4)
-						isEqual = true;
+						isEqual_Local = true;
 					else
-						isEqual = false;
+						isEqual_Local = false;
 					break;
 				default:
 					break;
@@ -557,11 +560,11 @@ public class XMLDataConverter {
 			}
 		} else {
 			if (node1.getTextContent().trim().equals(node2.getTextContent().trim()))
-				isEqual = true;
+				isEqual_Local = true;
 			else
-				isEqual = false;
+				isEqual_Local = false;
 		}
-		return isEqual;
+		return isEqual_Local;
 	}
 
 	private static boolean isAlreadyMatchedNode(List<Integer> lstMatchedPositions, int nodeCtr) {
