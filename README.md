@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/ravikalla/xml-compare.svg?branch=master)](https://travis-ci.org/ravikalla/xml-compare)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/fb2e5b1e69484d3c979351671a5f7225)](https://www.codacy.com/app/ravikalla/xml-compare?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ravikalla/xml-compare&amp;utm_campaign=Badge_Grade)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-
+[![Join the chat at https://gitter.im/capitalone/Hygieia](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/XML-Compare/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 # Compare two XMLs and write differences to an Excel
 
 ### Run Java code in local
