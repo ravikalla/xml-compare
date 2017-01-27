@@ -45,6 +45,10 @@ public class AppTest
 			logger.debug("IOException e : " + e.getMessage());
 			blnExceptionExists = true;
 		}
+    	catch (NullPointerException e) {
+			logger.debug("NullPointerException e : " + e.getMessage());
+			blnExceptionExists = true;
+		}
         assertTrue( blnExceptionExists );
     }
 }
