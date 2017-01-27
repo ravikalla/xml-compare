@@ -366,7 +366,7 @@ public class XMLDataConverter {
 				isEqual = equalTextOrAttributeNodes(node1, node2, mapIgnoreCaseSensitive, isEqual);
 			}
 			else { // if the node is not text or attribute node
-				isEqual = equalNonTextOrAttributeNodes(node1, node2, lstElementsToExclude, mapIgnoreCaseSensitive,
+				isEqual = equalNonTextOrAttNodes(node1, node2, lstElementsToExclude, mapIgnoreCaseSensitive,
 						isEqual, lstMatchedPositionsInSecondList);
 			}
 		}
@@ -375,7 +375,7 @@ public class XMLDataConverter {
 		return isEqual;
 	}
 
-	private static boolean equalNonTextOrAttributeNodes(Node node1, Node node2, List<String> lstElementsToExclude,
+	private static boolean equalNonTextOrAttNodes(Node node1, Node node2, List<String> lstElementsToExclude,
 			Map<String, String> mapIgnoreCaseSensitive, boolean isEqual,
 			List<Integer> lstMatchedPositionsInSecondList) {
 		boolean isEqual_Local = isEqual;
