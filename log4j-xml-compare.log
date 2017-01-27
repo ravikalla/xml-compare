@@ -53,3 +53,5 @@
 2017-01-03 00:53:36 DEBUG XMLDataConverter:678 - End : XMLDataConverter.printResultsToFile(...)
 2017-01-03 00:53:36 DEBUG CompareXMLAndXML:120 - End : CompareXMLAndXML.testCompareXMLAndXML_WriteResults()/home/ravi/Desktop/Projects/xml-compare/src/main/resources/XML1.xml : /home/ravi/Desktop/Projects/xml-compare/src/main/resources/XML2.xml : false
 2017-01-03 00:53:36 DEBUG CompareXMLAndXML:98 - End : CompareXMLAndXML.main(...)
+2017-01-27 00:31:58 DEBUG AppTest:49 - NullPointerException e : null
+2017-01-27 01:05:37 DEBUG AppTest:49 - NullPointerException e : null
