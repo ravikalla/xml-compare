@@ -11,10 +11,6 @@
   <description>Compares two XMLs</description>
   <url>www.ravikalla.in</url>
 
-	  <name>Maven core</name>
-  <description>The maven main core project description</description>
-  <url>http://maven.apache.org</url>
- 
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
