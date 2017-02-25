@@ -27,5 +27,4 @@
 ### Result:
 ![https://github.com/ravikalla/screenshots/blob/master/ComparisonResults.png](https://github.com/ravikalla/screenshots/blob/master/ComparisonResults.png)
 
-### Documentation:
-[Documentation](https://ravikalla.github.io/xml-compare)
+[Javadoc](https://ravikalla.github.io/xml-compare)
