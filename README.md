@@ -11,13 +11,13 @@
 
 ### Run Java code in local
 
-    java -jar xml-compare-0.0.1-SNAPSHOT-jar-with-dependencies.jar &lt;Input XML1 path> &lt;Input XML1 path> &lt;Output XLS path>
+    java -jar xml-compare-0.0.1-SNAPSHOT-jar-with-dependencies.jar <Input XML1 path> <Input XML1 path> <Output XLS path>
  Eg:
 
     java -jar xml-compare-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/ravi/Desktop/Projects/xml-compare/src/main/resources/XML1.xml /home/ravi/Desktop/Projects/xml-compare/src/main/resources/XML2.xml /home/ravi/Desktop/Projects/xml-compare/src/main/resources/Results2.xls
 
 ### Run as Docker image
-    docker run -p 8084:8080 -v <local path>:/usr/src -t ravikalla/xml-compare /usr/src/&lt;XML1 in local path> /usr/src/&lt;XML2 in local path> /usr/src/&lt;Results.xls in XML1 in local path>
+    docker run -p 8084:8080 -v <local path>:/usr/src -t ravikalla/xml-compare /usr/src/<XML1 in local path> /usr/src/<XML2 in local path> /usr/src/<Results.xls in XML1 in local path>
  Eg:
 
     docker run -p 8084:8080 -v /home/ravi/Desktop/Projects/xml-compare/src/main/resources:/usr/src -t ravikalla/xml-compare /usr/src/XML1.xml /usr/src/XML2.xml /usr/src/Results.xls
