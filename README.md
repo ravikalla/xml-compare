@@ -27,4 +27,5 @@
 ### Result:
 ![https://github.com/ravikalla/screenshots/blob/master/ComparisonResults.png](https://github.com/ravikalla/screenshots/blob/master/ComparisonResults.png)
 
+Javadoc in Github pages:
 [Javadoc](https://ravikalla.github.io/xml-compare)
