@@ -1,6 +1,6 @@
 FROM java:8
 
-LABEL maintainer "ravi2523096@yahoo.com"
+LABEL maintainer "ravi2523096@gmail.com"
 
 EXPOSE 8080
 VOLUME ["/usr/src", "/usr/src/myapp"]
