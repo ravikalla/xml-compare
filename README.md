@@ -1,6 +1,5 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/fb2e5b1e69484d3c979351671a5f7225)](https://www.codacy.com/app/ravikalla/xml-compare?utm_source=github.com&utm_medium=referral&utm_content=ravikalla/xml-compare&utm_campaign=badger)
 [![Build Status](https://travis-ci.org/ravikalla/xml-compare.svg?branch=master)](https://travis-ci.org/ravikalla/xml-compare)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fb2e5b1e69484d3c979351671a5f7225)](https://www.codacy.com/app/ravikalla/xml-compare?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ravikalla/xml-compare&amp;utm_campaign=Badge_Grade)
 [![Issue Count](https://codeclimate.com/github/ravikalla/xml-compare/badges/issue_count.svg)](https://codeclimate.com/github/ravikalla/xml-compare)
 [![Issues](https://img.shields.io/github/issues/ravikalla/xml-compare.svg?style=flat-square)](https://github.com/ravikalla/xml-compare/issues)
 [![Docker Stars](https://img.shields.io/docker/stars/ravikalla/xml-compare.svg)](https://hub.docker.com/r/ravikalla/xml-compare/)
