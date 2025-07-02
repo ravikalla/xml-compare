@@ -1,11 +1,11 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fb2e5b1e69484d3c979351671a5f7225)](https://www.codacy.com/app/ravikalla/xml-compare?utm_source=github.com&utm_medium=referral&utm_content=ravikalla/xml-compare&utm_campaign=badger)
-[![Build Status](https://travis-ci.org/ravikalla/xml-compare.svg?branch=main)](https://travis-ci.org/ravikalla/xml-compare)
-[![Issue Count](https://codeclimate.com/github/ravikalla/xml-compare/badges/issue_count.svg)](https://codeclimate.com/github/ravikalla/xml-compare)
 [![Issues](https://img.shields.io/github/issues/ravikalla/xml-compare.svg?style=flat-square)](https://github.com/ravikalla/xml-compare/issues)
+[![Forks](https://img.shields.io/github/forks/ravikalla/xml-compare.svg?style=flat-square)](https://github.com/ravikalla/xml-compare/network)
+[![Stars](https://img.shields.io/github/stars/ravikalla/xml-compare.svg?style=flat-square)](https://github.com/ravikalla/xml-compare/stargazers)
 [![Docker Stars](https://img.shields.io/docker/stars/ravikalla/xml-compare.svg)](https://hub.docker.com/r/ravikalla/xml-compare/)
 [![Docker Pull](https://img.shields.io/docker/pulls/ravikalla/xml-compare.svg)](https://hub.docker.com/r/ravikalla/xml-compare/)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Join the chat at https://gitter.im/capitalone/Hygieia](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/XML-Compare/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
+[![Java](https://img.shields.io/badge/Java-8%2B-blue.svg)](https://www.oracle.com/java/)
+[![Maven](https://img.shields.io/badge/Maven-3.6%2B-blue.svg)](https://maven.apache.org/)
 
 # Compare two XMLs and write differences to an Excel
 
