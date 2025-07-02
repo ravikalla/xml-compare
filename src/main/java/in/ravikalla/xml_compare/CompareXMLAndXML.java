@@ -30,14 +30,9 @@ package in.ravikalla.xml_compare;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -48,7 +43,11 @@ import org.xml.sax.SAXException;
 import in.ravikalla.xml_compare.dto.XMLToXMLComparisonResultsHolderDTO;
 import in.ravikalla.xml_compare.util.CommonUtil;
 import in.ravikalla.xml_compare.util.ConvertXMLToFullPathInCSV;
+import in.ravikalla.xml_compare.util.FileUtil;
+import in.ravikalla.xml_compare.util.ParameterLogger;
 import in.ravikalla.xml_compare.util.XMLDataConverter;
+import in.ravikalla.xml_compare.util.ValidationUtil;
+import in.ravikalla.xml_compare.util.XmlProcessor;
 
 /**
  * 
@@ -99,10 +98,20 @@ public class CompareXMLAndXML {
 		String strComparisonResultsFile = "Results.xls";
 		String strTrimElements = null;
 
-		if (null != args && args.length >= 3) {
-			strXMLFileName1 = args[0];
-			strXMLFileName2 = args[1];
-			strComparisonResultsFile = args[2];
+		try {
+			ValidationUtil.validateArguments(args);
+			if (null != args && args.length >= 3) {
+				strXMLFileName1 = args[0];
+				strXMLFileName2 = args[1];
+				strComparisonResultsFile = args[2];
+				
+				ValidationUtil.validateInputFiles(strXMLFileName1, strXMLFileName2);
+				ValidationUtil.validateOutputPath(strComparisonResultsFile);
+			}
+		} catch (IllegalArgumentException e) {
+			logger.error("Invalid arguments: " + e.getMessage());
+			System.err.println("Error: " + e.getMessage());
+			System.exit(1);
 		}
 		try {
 			testCompareXMLAndXMLWriteResults(strXMLFileName1, strXMLFileName2, strExcludeElementsFileName,
@@ -119,16 +128,16 @@ public class CompareXMLAndXML {
 		logger.debug("Start : CompareXMLAndXML.testCompareXMLAndXMLWriteResults()" + strXMLFileName1 + " : " + strXMLFileName2);
 		String xmlStr1 = CommonUtil.readDataFromFile(strXMLFileName1);
 		String xmlStr2 = CommonUtil.readDataFromFile(strXMLFileName2);
-		List<String> lstElementsToExclude = readTxtFileToList(strExcludeElementsFileName);
+		List<String> lstElementsToExclude = FileUtil.readTextFileToList(strExcludeElementsFileName);
 		List<String> lstIterativeElements = null;
 		String strPrimaryNodeXMLElementName = null;
 		if (null != strIterateElementsFileName)
-			lstIterativeElements = readTxtFileToList(strIterateElementsFileName);
+			lstIterativeElements = FileUtil.readTextFileToList(strIterateElementsFileName);
 		else
 			lstIterativeElements = ConvertXMLToFullPathInCSV.getFirstLevelOfReapeatingElements(xmlStr1, xmlStr2);
 
-		xmlStr1 = replaceEscapes(xmlStr1);
-		xmlStr2 = replaceEscapes(xmlStr2);
+		xmlStr1 = XmlProcessor.replaceEscapeCharacters(xmlStr1);
+		xmlStr2 = XmlProcessor.replaceEscapeCharacters(xmlStr2);
 
 		boolean testResult = CompareXMLAndXML.compareXMLAndXMLWriteResults(
 				strComparisonResultsFile, xmlStr1, xmlStr2,
@@ -141,7 +150,7 @@ public class CompareXMLAndXML {
 	private static boolean compareXMLAndXMLWriteResults(String strComparisonResultsFile, String xmlStr1,
 			String xmlStr2, List<String> lstIterativeElements, List<String> lstElementsToExclude,
 			String strPrimaryNodeXMLElementName, String strTrimElements) {
-		printParametersOfXMLtoXMLComparison(strComparisonResultsFile, xmlStr1,
+		ParameterLogger.logComparisonParameters(strComparisonResultsFile, xmlStr1,
 				xmlStr2, lstIterativeElements, lstElementsToExclude,
 				strPrimaryNodeXMLElementName, strTrimElements);
 
@@ -181,58 +190,5 @@ public class CompareXMLAndXML {
 			logger.error("83 : CompareXMLAndXML.CompareXMLAndXMLWriteResults(...) : ParserConfigurationException e : " + e);
 		}
 		return !blnDifferencesExists;
-	}
-	private static void printParametersOfXMLtoXMLComparison(String strComparisonResultsFile, String xmlStr1,
-			String xmlStr2, List<String> lstIterativeElements, List<String> lstElementsToExclude,
-			String strPrimaryNodeXMLElementName, String strTrimElements) {
-		PrintWriter out = null;
-		try {
-			String strIterativeElements = lstIterativeElements.stream().map(Object::toString).collect(Collectors.joining(","));
-			String strElementsToExclude = lstElementsToExclude.stream().map(Object::toString).collect(Collectors.joining(","));
-			out = new PrintWriter(strComparisonResultsFile + "_Params");
-			out.println(strComparisonResultsFile + "\n@xmlStr1 : " + xmlStr1 + "\n@xmlStr2 : "
-					+ xmlStr2 + "\n@strIterativeElement : " + strIterativeElements
-					+ "@lstElementsToExclude : " + strElementsToExclude
-					+ "@strPrimaryNodeXMLElementName : " + strPrimaryNodeXMLElementName
-					+ "@strTrimElements : " + strTrimElements
-					);
-		} catch (FileNotFoundException e) {
-			logger.error("103 : CompareXMLAndXML.printParametersOfXMLtoXMLComparison(...) : FileNotFoundException e : " + e);
-		} finally {
-			if (null != out)
-				out.close();
-		}
-	}
-	private static String replaceEscapes(String xmlStr) {
-		String xmlStr_Local = xmlStr.replaceAll("&lt;", "<").replaceAll("<\\?.*?\\?>", "");
-		xmlStr_Local = xmlStr_Local.replaceAll("&gt;", ">").replaceAll("<\\?.*?\\?>", "");
-		return xmlStr_Local;
-	}
-	private static List<String> readTxtFileToList(String strFileName) {
-		logger.debug("Start : CompareXMLAndXML.readTxtFileToList(...)");
-		BufferedReader br = null;
-		String strLine = null;
-		List<String> lstLines = new ArrayList<String>();
-		try {
-			if (null != strFileName && strFileName.trim().length() > 0) {
-				br = new BufferedReader(new BufferedReader(new FileReader(strFileName)));
-				while ((strLine = br.readLine()) != null)
-					lstLines.add(strLine);
-			}
-		} catch (FileNotFoundException e) {
-			logger.error("39 : CompareXMLAndXML.readTxtFileToList(...) : FileNotFoundException e : " + e);
-		} catch (IOException e) {
-			logger.error("41 : CompareXMLAndXML.readTxtFileToList(...) : IOException e : " + e);
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					logger.error("47 : CompareXMLAndXML.readTxtFileToList(...) : IOException e : " + e);
-				}
-			}
-		}
-		logger.debug("End : CompareXMLAndXML.readTxtFileToList(...)");
-		return lstLines;
 	}
 }
