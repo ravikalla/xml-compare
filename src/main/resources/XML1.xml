@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Schools>
+	<School>
+		<SchoolName>School1</SchoolName>
+		<Students>
+			<Student>Student1_1</Student>
+			<Student>Student1_2</Student>
+		</Students>
+	</School>
+	<School>
+		<SchoolName>School2</SchoolName>
+		<Students>
+			<Student>Student2_1</Student>
+			<Student>Student2_2</Student>
+		</Students>
+	</School>
+	<School>
+		<SchoolName>School3</SchoolName>
+		<Students>
+			<Student>Student3_1</Student>
+			<Student>Student3_2</Student>
+		</Students>
+	</School>
+	<School>
+		<SchoolName>School4</SchoolName>
+		<Students>
+			<Student>Student4_1</Student>
+			<Student>Student4_2</Student>
+		</Students>
+	</School>
+	<School>
+		<SchoolName>School7</SchoolName>
+		<Students>
+			<Student>Student7_1</Student>
+			<Student>Student7_2</Student>
+		</Students>
+	</School>
+	<School>
+		<SchoolName>School5</SchoolName>
+		<Students>
+			<Student>Student5_1</Student>
+			<Student>Student5_2</Student>
+		</Students>
+	</School>
+</Schools>
