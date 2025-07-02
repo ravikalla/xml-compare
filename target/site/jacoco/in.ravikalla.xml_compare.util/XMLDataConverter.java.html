@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>XMLDataConverter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xml-compare</a> &gt; <a href="index.source.html" class="el_package">in.ravikalla.xml_compare.util</a> &gt; <span class="el_source">XMLDataConverter.java</span></div><h1>XMLDataConverter.java</h1><pre class="source lang-java linenums">package in.ravikalla.xml_compare.util;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import in.ravikalla.xml_compare.dto.SimpleNamespaceContext;
+import in.ravikalla.xml_compare.dto.XMLToXMLComparisonResultsHolderDTO;
+
+<span class="nc" id="L36">public class XMLDataConverter {</span>
+<span class="fc" id="L37">	private final static Logger logger = LogManager.getLogger(XMLDataConverter.class);</span>
+<span class="fc" id="L38">	public static DocumentBuilder builder = null;</span>
+
+	public static XMLToXMLComparisonResultsHolderDTO compXPathEleDataWithChildEle(String xmlStr1,
+			String xmlStr2, String strIterativeElement, List&lt;String&gt; lstElementsToExclude, String strPrimaryNodeXMLElementName,
+			String strTrimElements) throws SAXException, IOException, ParserConfigurationException {
+<span class="fc" id="L43">		String strTrimElements_Local = strTrimElements;</span>
+<span class="fc" id="L44">		logger.debug(&quot;Start : XMLDataConverter.compareXPathElementsDataWithChildElements(...)&quot;);</span>
+<span class="fc" id="L45">		XMLToXMLComparisonResultsHolderDTO objXMLToXMLComparisonResultsHolderDTO = new XMLToXMLComparisonResultsHolderDTO();</span>
+
+<span class="fc" id="L47">		List&lt;String&gt; lstMissmatchedDataForCSV = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L48">		List&lt;String&gt; lstMatchedDataForCSV = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L49">		Map&lt;Integer, Integer&gt; mapMatchedNodePositions = new HashMap&lt;Integer, Integer&gt; ();</span>
+<span class="fc" id="L50">		NodeList nodeListRoot1 = null;</span>
+<span class="fc" id="L51">		NodeList nodeListRoot2 = null;</span>
+
+<span class="fc" id="L53">		XPathFactory xpathFactory = XPathFactory.newInstance();</span>
+<span class="fc" id="L54">		XPath xpath1 = xpathFactory.newXPath();</span>
+<span class="fc" id="L55">		XPath xpath2 = xpathFactory.newXPath();</span>
+
+<span class="fc" id="L57">		DocumentBuilder builder = XMLDataConverter.getDocumentBuilder();</span>
+<span class="fc" id="L58">		Document doc1 = builder.parse(new InputSource(new StringReader(xmlStr1)));</span>
+<span class="fc" id="L59">		Document doc2 = builder.parse(new InputSource(new StringReader(xmlStr2)));</span>
+
+<span class="fc" id="L61">		doc1.getDocumentElement().normalize();</span>
+<span class="fc" id="L62">		doc2.getDocumentElement().normalize();</span>
+
+		// Compare the data by ignoreCaseSensitive
+<span class="fc" id="L65">		Map&lt;String, String&gt; mapCaseSensitiveValues = new HashMap&lt;String, String&gt;();</span>
+<span class="fc" id="L66">		String strCaseSensitiveValues = &quot;&quot;;</span>
+		try {
+			
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">			if (null != strTrimElements_Local) {</span>
+<span class="nc" id="L70">				String[] arrTrimElements = strTrimElements_Local.split(&quot;&amp;&amp;&quot;);</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">				if (arrTrimElements.length &gt; 1) {</span>
+<span class="nc" id="L72">					strTrimElements_Local = arrTrimElements[0];</span>
+<span class="nc" id="L73">					strCaseSensitiveValues = arrTrimElements[1];</span>
+				}
+<span class="nc bnc" id="L75" title="All 4 branches missed.">				if (null != strTrimElements_Local &amp;&amp; strTrimElements_Local.equals(&quot;&quot;))</span>
+<span class="nc" id="L76">					strTrimElements_Local = null;</span>
+<span class="nc" id="L77">				mapCaseSensitiveValues = Util_XMLConvert.convertTrimmableElementsToMap(strCaseSensitiveValues, &quot;;&quot;, &quot;,&quot;);</span>
+
+<span class="nc" id="L79">				logger.debug(&quot;Map size for mapCaseSensitiveValues : &quot; + mapCaseSensitiveValues.size());</span>
+			}
+<span class="nc" id="L81">		} catch(Exception ex) {</span>
+<span class="nc" id="L82">			logger.error(&quot;62 : XMLDataConverter.compareXPathElementsDataWithChildElements(...) : ex : &quot; + ex);</span>
+		}
+		// End : Compare the data by ignore case sensitive
+
+<span class="pc bpc" id="L86" title="5 of 6 branches missed.">		if (null != strTrimElements_Local &amp;&amp; !strTrimElements_Local.trim().equals(&quot;&quot;) &amp;&amp; strTrimElements_Local.split(&quot;,&quot;)[1].equals(&quot;;&quot;))</span>
+<span class="nc" id="L87">			strTrimElements_Local = null;</span>
+
+<span class="fc" id="L89">		Map&lt;String, String&gt; mapTrimElements = Util_XMLConvert.convertTrimmableElementsToMap(strTrimElements_Local, &quot;;&quot;, &quot;,&quot;);</span>
+<span class="fc" id="L90">		NodeList lstChildNodeList1 = doc1.getChildNodes();</span>
+<span class="fc" id="L91">		Util_XMLConvert.trimValueIfApplicable(lstChildNodeList1, mapTrimElements);</span>
+<span class="fc" id="L92">		NodeList lstChildNodeList2 = doc2.getChildNodes();</span>
+<span class="fc" id="L93">		Util_XMLConvert.trimValueIfApplicable(lstChildNodeList2, mapTrimElements);</span>
+<span class="fc" id="L94">		Map&lt;String, String&gt; prefMap1 = getAttributeMap(doc1);</span>
+<span class="fc" id="L95">		SimpleNamespaceContext namespaces1 = new SimpleNamespaceContext(prefMap1);</span>
+<span class="fc" id="L96">		xpath1.setNamespaceContext(namespaces1);</span>
+<span class="fc" id="L97">		Map&lt;String, String&gt; prefMap2 = getAttributeMap(doc2);</span>
+<span class="fc" id="L98">		SimpleNamespaceContext namespaces2 = new SimpleNamespaceContext(prefMap2);</span>
+<span class="fc" id="L99">		xpath2.setNamespaceContext(namespaces2);</span>
+
+		try {
+			// Get repeatable elements count
+<span class="fc" id="L103">			XPathExpression expr1 = xpath1.compile(&quot;count(&quot; + strIterativeElement + &quot;)&quot;);</span>
+<span class="fc" id="L104">			int intElementCount1 = ((Double) expr1.evaluate(doc1,  XPathConstants.NUMBER)).intValue();</span>
+<span class="fc" id="L105">			XPathExpression expr2 = xpath2.compile(&quot;count(&quot; + strIterativeElement + &quot;)&quot;);</span>
+<span class="fc" id="L106">			int intElementCount2 = ((Double) expr2.evaluate(doc2,  XPathConstants.NUMBER)).intValue();</span>
+
+<span class="fc" id="L108">			logger.debug(&quot;92 : &quot; + strIterativeElement + &quot; : &quot; + intElementCount1 + &quot; : &quot; + intElementCount2);</span>
+
+<span class="fc" id="L110">			expr2 = xpath2.compile(strIterativeElement);</span>
+<span class="fc" id="L111">			nodeListRoot2 = (NodeList) expr2.evaluate(doc2,  XPathConstants.NODESET);</span>
+<span class="fc" id="L112">			logger.debug(&quot;96 : &quot; + nodeListRoot2.getLength());</span>
+
+			// Read content from XML1
+<span class="fc" id="L115">			getIterativeElementOccurences(strIterativeElement, lstElementsToExclude, mapMatchedNodePositions,</span>
+<span class="fc" id="L116">					nodeListRoot2, xpath1, doc1, mapCaseSensitiveValues, intElementCount1);</span>
+<span class="fc" id="L117">			expr1 = xpath1.compile(strIterativeElement);</span>
+<span class="fc" id="L118">			nodeListRoot1 = (NodeList) expr1.evaluate(doc1,  XPathConstants.NODESET);</span>
+
+			// Find the mismatched node positions in XML1 and XML2 from the matched positions
+<span class="fc" id="L121">			getMatchedAndMismatchedDataForCSV(lstElementsToExclude, objXMLToXMLComparisonResultsHolderDTO,</span>
+<span class="fc" id="L122">					lstMissmatchedDataForCSV, lstMatchedDataForCSV, mapMatchedNodePositions, nodeListRoot1,</span>
+<span class="fc" id="L123">					nodeListRoot2, intElementCount1, intElementCount2);</span>
+<span class="pc" id="L124">		} catch (XPathExpressionException e) {</span>
+<span class="nc" id="L125">			logger.error(&quot;140 : XMLDataConverter.compareXPathElementsDataWithChildElements(...) : XPathExpressionException e : &quot; + e);</span>
+		}
+
+<span class="fc" id="L128">		logger.debug(&quot;End : XMLDataConverter.compareXPathElementsDataWithChildElements(...)&quot;);</span>
+<span class="fc" id="L129">		return objXMLToXMLComparisonResultsHolderDTO;</span>
+	}
+
+	private static void getMatchedAndMismatchedDataForCSV(List&lt;String&gt; lstElementsToExclude,
+			XMLToXMLComparisonResultsHolderDTO objXMLToXMLComparisonResultsHolderDTO,
+			List&lt;String&gt; lstMissmatchedDataForCSV, List&lt;String&gt; lstMatchedDataForCSV,
+			Map&lt;Integer, Integer&gt; mapMatchedNodePositions, NodeList nodeListRoot1, NodeList nodeListRoot2,
+			int intElementCount1, int intElementCount2) {
+<span class="fc" id="L137">		List&lt;String&gt; lstMatchedElementPositions_ColonSeparated = findMatchedNodePositionsInXML1AndXML2(mapMatchedNodePositions, intElementCount1);</span>
+<span class="fc" id="L138">		List&lt;String&gt; lstMismatchedElementPositions_ColonSeparated = findMismatchedNodePositionsInXML1AndXML2(mapMatchedNodePositions, intElementCount1, intElementCount2);</span>
+<span class="fc" id="L139">		List&lt;String&gt; lstNodeInformation_Temp = null;</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">		for (String strMismatchedPosition_ColumnSeparated : lstMismatchedElementPositions_ColonSeparated) {</span>
+<span class="fc" id="L141">			lstNodeInformation_Temp = getNodeInformationForMismatchedData(strMismatchedPosition_ColumnSeparated, nodeListRoot1, nodeListRoot2, lstElementsToExclude);</span>
+<span class="pc bpc" id="L142" title="2 of 4 branches missed.">			if (null != lstNodeInformation_Temp &amp;&amp; lstNodeInformation_Temp.size() &gt; 0) {</span>
+<span class="fc" id="L143">				lstMissmatchedDataForCSV.add(&quot;,,,&quot;); // Adding empty row before showing next set of nodes</span>
+<span class="fc" id="L144">				lstMissmatchedDataForCSV.addAll(lstNodeInformation_Temp);</span>
+			}
+		}
+<span class="fc bfc" id="L147" title="All 2 branches covered.">		for (String strMatchedPosition_ColSeparated : lstMatchedElementPositions_ColonSeparated) {</span>
+<span class="fc" id="L148">			lstNodeInformation_Temp = getNodeInformationForMatchedData(strMatchedPosition_ColSeparated, nodeListRoot1);</span>
+<span class="pc bpc" id="L149" title="2 of 4 branches missed.">			if (null != lstNodeInformation_Temp &amp;&amp; lstNodeInformation_Temp.size() &gt; 0) {</span>
+<span class="fc" id="L150">				lstMatchedDataForCSV.add(&quot;,,,&quot;); // Adding empty row before showing next set of nodes</span>
+<span class="fc" id="L151">				lstMatchedDataForCSV.addAll(lstNodeInformation_Temp);</span>
+			}
+		}
+<span class="fc" id="L154">		objXMLToXMLComparisonResultsHolderDTO.lstMatchedDataForCSV = lstMatchedDataForCSV;</span>
+<span class="fc" id="L155">		objXMLToXMLComparisonResultsHolderDTO.lstMismatchedDataForCSV = lstMissmatchedDataForCSV;</span>
+<span class="fc" id="L156">	}</span>
+
+	private static void getIterativeElementOccurences(String strIterativeElement, List&lt;String&gt; lstElementsToExclude,
+			Map&lt;Integer, Integer&gt; mapMatchedNodePositions, NodeList nodeListRoot2, XPath xpath1, Document doc1,
+			Map&lt;String, String&gt; mapCaseSensitiveValues, int intElementCount1) throws XPathExpressionException {
+		int intTempNode2Position;
+		NodeList nodeListRoot1;
+		Node node1;
+		XPathExpression expr1;
+<span class="fc bfc" id="L165" title="All 2 branches covered.">		for (int intElementCtr1 = 0; intElementCtr1 &lt; intElementCount1; intElementCtr1++) {</span>
+
+			// Idetify element from first XML
+<span class="fc" id="L168">			expr1 = xpath1.compile(strIterativeElement + &quot;[&quot; + (intElementCtr1 + 1) + &quot;]&quot;);</span>
+<span class="fc" id="L169">			nodeListRoot1 = (NodeList) expr1.evaluate(doc1,  XPathConstants.NODESET);</span>
+<span class="fc" id="L170">			node1 = null;</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">			if (nodeListRoot1.getLength() &gt; 0)</span>
+<span class="fc" id="L172">				node1 = nodeListRoot1.item(0);</span>
+<span class="fc" id="L173">			intTempNode2Position = -1;</span>
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">			if (null != node1) {</span>
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">				if (eligibleNodeForValidation(node1, lstElementsToExclude)) {</span>
+<span class="fc" id="L176">					intTempNode2Position = getPositionOfMatchingNodeFromList(node1, nodeListRoot2, mapMatchedNodePositions, lstElementsToExclude, mapCaseSensitiveValues);</span>
+				}
+<span class="fc bfc" id="L178" title="All 2 branches covered.">				if (-1 != intTempNode2Position) {</span>
+<span class="fc" id="L179">					mapMatchedNodePositions.put(new Integer(intElementCtr1), new Integer(intTempNode2Position));</span>
+				}
+			}
+		}
+<span class="fc" id="L183">	}</span>
+
+	private static List&lt;String&gt; getNodeInformationForMatchedData(String strMatchedPosition_ColSeparated,
+			NodeList nodeListRoot1) {
+<span class="fc" id="L187">		List&lt;String&gt; lstResult = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L188">		List&lt;String&gt; lstNode1Data = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L189">		int intElePos1 = -1;</span>
+
+//		Find data for XML1
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">		if (!strMatchedPosition_ColSeparated.trim().equals(&quot;&quot;)) {</span>
+<span class="fc" id="L193">			intElePos1 = Integer.parseInt(strMatchedPosition_ColSeparated.trim());</span>
+<span class="fc" id="L194">			lstNode1Data.addAll(getListOfCSVDataRows(nodeListRoot1.item(intElePos1)));</span>
+		}
+//		Merge data rows into CSV format
+<span class="fc" id="L197">		lstResult = mergeMatchedListsInCSVFormat(lstNode1Data);</span>
+<span class="fc" id="L198">		return lstResult;</span>
+	}
+
+	private static List&lt;String&gt; getNodeInformationForMismatchedData(String strMismatchedPosition_ColumnSeparated,
+			NodeList nodeListRoot1, NodeList nodeListRoot2, List&lt;String&gt; lstElementsToExclude) {
+<span class="fc" id="L203">		List&lt;String&gt; lstResult = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L204">		List&lt;String&gt; lstNode1Data = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L205">		List&lt;String&gt; lstNode2Data = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L206">		String[] arrMismatchedPositions = strMismatchedPosition_ColumnSeparated.split(&quot;:&quot;);</span>
+<span class="fc" id="L207">		int intElePos1 = -1;</span>
+<span class="fc" id="L208">		int intElePos2 = -1;</span>
+
+//		Find data for XML1
+<span class="fc bfc" id="L211" title="All 2 branches covered.">		if (!arrMismatchedPositions[0].trim().equals(&quot;&quot;)) {</span>
+<span class="fc" id="L212">			intElePos1 = Integer.parseInt(arrMismatchedPositions[0].trim());</span>
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">			if (eligibleNodeForValidation(nodeListRoot1.item(intElePos1), lstElementsToExclude))</span>
+<span class="fc" id="L214">				lstNode1Data.addAll(getListOfCSVDataRows(nodeListRoot1.item(intElePos1)));</span>
+		}
+//		Find data for XML2
+<span class="fc bfc" id="L217" title="All 2 branches covered.">		if (!arrMismatchedPositions[1].trim().equals(&quot;&quot;)) {</span>
+<span class="fc" id="L218">			intElePos2 = Integer.parseInt(arrMismatchedPositions[1].trim());</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">			if (eligibleNodeForValidation(nodeListRoot2.item(intElePos2), lstElementsToExclude))</span>
+<span class="fc" id="L220">				lstNode2Data.addAll(getListOfCSVDataRows(nodeListRoot2.item(intElePos2)));</span>
+		}
+//		Merge data rows into CSV format
+<span class="fc" id="L223">		lstResult = mergeMismatchedListsInCSVFormat(lstNode1Data, lstNode2Data);</span>
+<span class="fc" id="L224">		return lstResult;</span>
+	}
+
+	private static List&lt;String&gt; mergeMismatchedListsInCSVFormat(List&lt;String&gt; lstNode1Data, List&lt;String&gt; lstNode2Data) {
+<span class="fc" id="L228">		List&lt;String&gt; lstResults = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L229">		int intLst1Size = lstNode1Data.size();</span>
+<span class="fc" id="L230">		int intLst2Size = lstNode2Data.size();</span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">		for (int i = 0; i &lt; intLst1Size; i++)</span>
+<span class="fc" id="L232">			lstResults.add(lstNode1Data.get(i) + &quot;, , &quot;);</span>
+<span class="fc bfc" id="L233" title="All 2 branches covered.">		for (int i = 0; i &lt; intLst2Size; i++)</span>
+<span class="fc" id="L234">			lstResults.add(&quot; , ,&quot; + lstNode2Data.get(i));</span>
+<span class="fc" id="L235">		return lstResults;</span>
+	}
+	private static List&lt;String&gt; mergeMatchedListsInCSVFormat(List&lt;String&gt; lstNode1Data) {
+<span class="fc" id="L238">		List&lt;String&gt; lstResults = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L239">		int intLst1Size = lstNode1Data.size();</span>
+<span class="fc" id="L240">		String str1 = null;</span>
+//		String str2 = null;
+//		str2 = &quot; , &quot;;
+<span class="fc bfc" id="L243" title="All 2 branches covered.">		for (int i = 0; i &lt; intLst1Size; i++) {</span>
+<span class="fc" id="L244">			str1 = lstNode1Data.get(i);</span>
+<span class="fc" id="L245">			String[] strArray = str1.split(&quot;,&quot;);</span>
+<span class="pc bpc" id="L246" title="1 of 2 branches missed.">			if (strArray.length &gt; 1)</span>
+<span class="fc" id="L247">				lstResults.add(str1 + &quot;,&quot; + strArray[1]);</span>
+			else
+<span class="nc" id="L249">				lstResults.add(str1 + &quot;,&quot; + &quot;&quot;);</span>
+		}
+<span class="fc" id="L251">		return lstResults;</span>
+	}
+
+	private static Collection&lt;? extends String&gt; getListOfCSVDataRows(Node objNode) {
+<span class="fc" id="L255">		List&lt;String&gt; lstDataRows = new ArrayList&lt;String&gt;();</span>
+<span class="fc bfc" id="L256" title="All 2 branches covered.">		if (isSimpleElement(objNode))</span>
+<span class="fc" id="L257">			lstDataRows.add(getCompletePathAndDataInCSVFormat(objNode));</span>
+		else { // If it is a complex element
+<span class="fc" id="L259">			NodeList lstChildNodes = objNode.getChildNodes();</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">			for (int i=0; i &lt; lstChildNodes.getLength(); i++) {</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">				if (lstChildNodes.item(i).getNodeType() != Node.TEXT_NODE) { // Eliminating blank spaces between child elements of a node</span>
+<span class="fc" id="L262">					lstDataRows.addAll(getListOfCSVDataRows(lstChildNodes.item(i)));</span>
+				}
+			}
+		}
+<span class="fc" id="L266">		return lstDataRows;</span>
+	}
+
+	private static String getCompletePathAndDataInCSVFormat(Node objNode) {
+<span class="fc" id="L270">		String strCompletepathAndDataInCSVFormat = null;</span>
+<span class="fc" id="L271">		String strData = objNode.getTextContent();</span>
+<span class="fc" id="L272">		String strCompletePath = getCompletePathForANode(objNode);</span>
+<span class="fc" id="L273">		strCompletepathAndDataInCSVFormat = strCompletePath + &quot;,&quot; + strData;</span>
+<span class="fc" id="L274">		return strCompletepathAndDataInCSVFormat;</span>
+	}
+
+	private static boolean isSimpleElement(Node objNode) {
+<span class="fc" id="L278">		NodeList lstChildNodes = objNode.getChildNodes();</span>
+<span class="fc" id="L279">		boolean isSimpleElement = true;</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">		for (int i=0; i &lt; lstChildNodes.getLength(); i++) {</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">			if (lstChildNodes.item(i).getNodeType() != Node.TEXT_NODE) { // Eliminating blank spaces between child elements of a node</span>
+<span class="fc" id="L282">				isSimpleElement = false;</span>
+			}
+		}
+<span class="fc" id="L285">		return isSimpleElement;</span>
+	}
+
+	private static List&lt;String&gt; findMismatchedNodePositionsInXML1AndXML2(Map&lt;Integer, Integer&gt; mapMatchedNodePositions,
+			int intElementCount1, int intElementCount2) {
+<span class="fc" id="L290">		List&lt;String&gt; lstMismatchedNodePositionsInXML1AndXML2 = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L291">		List&lt;String&gt; lstMismatchedPositionsInXML1 = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L292">		List&lt;String&gt; lstMismatchedPositionsInXML2 = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L293">		String strPosition1 = null;</span>
+<span class="fc" id="L294">		String strPosition2 = null;</span>
+
+<span class="pc bpc" id="L296" title="1 of 4 branches missed.">		for (int intTempPos = 0; intTempPos &lt; intElementCount1 || intTempPos &lt; intElementCount2; intTempPos++) {</span>
+<span class="fc" id="L297">			boolean blnElementFoundInXML1 = false;</span>
+<span class="fc" id="L298">			boolean blnElementFoundInXML2 = false;</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">			for (Map.Entry&lt;Integer, Integer&gt; objEntry : mapMatchedNodePositions.entrySet()) {</span>
+<span class="fc bfc" id="L300" title="All 2 branches covered.">				if (objEntry.getKey().intValue() == intTempPos)</span>
+<span class="fc" id="L301">					blnElementFoundInXML1 = true;</span>
+<span class="fc bfc" id="L302" title="All 2 branches covered.">				if (objEntry.getValue().intValue() == intTempPos)</span>
+<span class="fc" id="L303">					blnElementFoundInXML2 = true;</span>
+			}
+<span class="pc bpc" id="L305" title="1 of 4 branches missed.">			if ((!blnElementFoundInXML1) &amp;&amp; (intTempPos &lt; intElementCount1))</span>
+<span class="fc" id="L306">					lstMismatchedPositionsInXML1.add((new Integer(intTempPos)).toString());</span>
+<span class="pc bpc" id="L307" title="1 of 4 branches missed.">			if ((!blnElementFoundInXML2) &amp;&amp; (intTempPos &lt; intElementCount2))</span>
+<span class="fc" id="L308">					lstMismatchedPositionsInXML2.add((new Integer(intTempPos)).toString());</span>
+		}
+<span class="fc bfc" id="L310" title="All 2 branches covered.">		for (int intTempPos = 0; intTempPos &lt; lstMismatchedPositionsInXML1.size(); intTempPos++) {</span>
+<span class="fc" id="L311">			strPosition1 = lstMismatchedPositionsInXML1.get(intTempPos);</span>
+<span class="fc" id="L312">			lstMismatchedNodePositionsInXML1AndXML2.add(strPosition1 + &quot;: &quot;);</span>
+		}
+<span class="fc bfc" id="L314" title="All 2 branches covered.">		for (int intTempPos = 0; intTempPos &lt; lstMismatchedPositionsInXML2.size(); intTempPos++) {</span>
+<span class="fc" id="L315">			strPosition2 = lstMismatchedPositionsInXML2.get(intTempPos);</span>
+<span class="fc" id="L316">			lstMismatchedNodePositionsInXML1AndXML2.add(&quot; :&quot; + strPosition2);</span>
+		}
+<span class="fc" id="L318">		return lstMismatchedNodePositionsInXML1AndXML2;</span>
+	}
+
+	private static List&lt;String&gt; findMatchedNodePositionsInXML1AndXML2(Map&lt;Integer, Integer&gt; mapMatchedNodePositions,
+			int intElementCount1) {
+<span class="fc" id="L323">		List&lt;String&gt; lstMatchedNodePositionsInXML1 = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L324">		List&lt;String&gt; lstMatchedPositionsInXML1 = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L325">		String strPosition1 = null;</span>
+<span class="fc bfc" id="L326" title="All 2 branches covered.">		for (int intTempPos = 0; intTempPos &lt; intElementCount1; intTempPos++) {</span>
+<span class="fc" id="L327">			boolean blnElementFoundInXML1 = false;</span>
+<span class="fc bfc" id="L328" title="All 2 branches covered.">			for (Map.Entry&lt;Integer, Integer&gt; objEntry : mapMatchedNodePositions.entrySet()) {</span>
+<span class="fc bfc" id="L329" title="All 2 branches covered.">				if (objEntry.getKey().intValue() == intTempPos)</span>
+<span class="fc" id="L330">					blnElementFoundInXML1 = true;</span>
+			}
+<span class="pc bpc" id="L332" title="1 of 4 branches missed.">			if ((blnElementFoundInXML1) &amp;&amp; (intTempPos &lt; intElementCount1))</span>
+<span class="fc" id="L333">					lstMatchedPositionsInXML1.add((new Integer(intTempPos)).toString());</span>
+		}
+<span class="fc bfc" id="L335" title="All 2 branches covered.">		for (int intTempPos = 0; intTempPos &lt; lstMatchedPositionsInXML1.size(); intTempPos++) {</span>
+<span class="pc bpc" id="L336" title="1 of 2 branches missed.">			if(intTempPos &gt;= lstMatchedPositionsInXML1.size())</span>
+<span class="nc" id="L337">				strPosition1 = &quot; &quot;;</span>
+			else
+<span class="fc" id="L339">				strPosition1 = lstMatchedPositionsInXML1.get(intTempPos);</span>
+<span class="fc" id="L340">			lstMatchedNodePositionsInXML1.add(strPosition1);</span>
+		}
+<span class="fc" id="L342">		return lstMatchedNodePositionsInXML1;</span>
+	}
+
+	private static int getPositionOfMatchingNodeFromList(Node node1, NodeList nodeListRoot2,
+			Map&lt;Integer, Integer&gt; mapMatchedNodePositions, List&lt;String&gt; lstElementsToExclude,
+			Map&lt;String, String&gt; mapIgnoreCaseSensitiveValues) {
+<span class="fc" id="L348">		int intPositionOfMatchingNodeFromList = -1;</span>
+<span class="fc bfc" id="L349" title="All 2 branches covered.">		for (int intNodePositionInLst2 = 0; intNodePositionInLst2 &lt; nodeListRoot2.getLength(); intNodePositionInLst2++) {</span>
+<span class="fc bfc" id="L350" title="All 2 branches covered.">			if ((!isNumberPresentInMapValue(intNodePositionInLst2, mapMatchedNodePositions))</span>
+<span class="pc bpc" id="L351" title="1 of 2 branches missed.">				&amp;&amp; (eligibleNodeForValidation(nodeListRoot2.item(intNodePositionInLst2), lstElementsToExclude))</span>
+<span class="fc bfc" id="L352" title="All 2 branches covered.">					&amp;&amp; (equal(node1, nodeListRoot2.item(intNodePositionInLst2), lstElementsToExclude, mapIgnoreCaseSensitiveValues))) {</span>
+<span class="fc" id="L353">						intPositionOfMatchingNodeFromList = intNodePositionInLst2;</span>
+<span class="fc" id="L354">						break;</span>
+			}
+		}
+<span class="fc" id="L357">		return intPositionOfMatchingNodeFromList;</span>
+	}
+
+	private static boolean equal(Node node1, Node node2, List&lt;String&gt; lstElementsToExclude,
+			Map&lt;String, String&gt; mapIgnoreCaseSensitive) {
+<span class="fc" id="L362">		boolean isEqual = true;</span>
+<span class="fc" id="L363">		List&lt;Integer&gt; lstMatchedPositionsInSecondList = new ArrayList&lt;Integer&gt; ();</span>
+
+<span class="fc bfc" id="L365" title="All 4 branches covered.">		if ((node1.getNodeType() == node2.getNodeType()) &amp;&amp; (node1.getNodeName().equals(node2.getNodeName()))) {</span>
+<span class="pc bpc" id="L366" title="1 of 4 branches missed.">			if (node1.getNodeType() == Node.TEXT_NODE || node1.getNodeType() == Node.ATTRIBUTE_NODE) {</span>
+<span class="fc" id="L367">				isEqual = equalTextOrAttributeNodes(node1, node2, mapIgnoreCaseSensitive, isEqual);</span>
+<span class="fc" id="L368">			}</span>
+			else { // if the node is not text or attribute node
+<span class="fc" id="L370">				isEqual = equalNonTextOrAttNodes(node1, node2, lstElementsToExclude, mapIgnoreCaseSensitive,</span>
+<span class="fc" id="L371">						isEqual, lstMatchedPositionsInSecondList);</span>
+			}
+<span class="fc" id="L373">		}</span>
+		else
+<span class="fc" id="L375">			isEqual = false;</span>
+<span class="fc" id="L376">		return isEqual;</span>
+	}
+
+	private static boolean equalNonTextOrAttNodes(Node node1, Node node2, List&lt;String&gt; lstElementsToExclude,
+			Map&lt;String, String&gt; mapIgnoreCaseSensitive, boolean isEqual,
+			List&lt;Integer&gt; lstMatchedPositionsInSecondList) {
+<span class="fc" id="L382">		boolean isEqual_Local = isEqual;</span>
+		int node1Ctr;
+		int node2Ctr;
+<span class="fc" id="L385">		List&lt;Node&gt; lst1 = getChildrenWithoutTextNodesIfComplex(node1, lstElementsToExclude);</span>
+<span class="fc" id="L386">		List&lt;Node&gt; lst2 = getChildrenWithoutTextNodesIfComplex(node2, lstElementsToExclude);</span>
+<span class="fc" id="L387">		logger.debug(&quot;246 : XMLDataConverter.equal(...) : &quot; + lst1.size() + &quot; : &quot; + lst2.size());</span>
+<span class="pc bpc" id="L388" title="4 of 6 branches missed.">		if (lst1.size() == lst2.size() &amp;&amp; lst1.isEmpty() &amp;&amp; lst2.isEmpty()) {</span>
+<span class="nc" id="L389">			NodeList childNodes1 = node1.getChildNodes();</span>
+<span class="nc" id="L390">			NodeList childNodes2 = node2.getChildNodes();</span>
+<span class="nc bnc" id="L391" title="All 8 branches missed.">			if (null != childNodes1 &amp;&amp; childNodes1.getLength() &gt; 0 &amp;&amp; null != childNodes2 &amp;&amp; childNodes2.getLength() &gt; 0) {</span>
+<span class="nc" id="L392">				logger.debug(&quot;Child Nodes Length : &quot; + childNodes1.getLength() + &quot; : &quot; + childNodes2.getLength());</span>
+<span class="nc bnc" id="L393" title="All 2 branches missed.">				if (childNodes1.getLength() != childNodes2.getLength())</span>
+<span class="nc" id="L394">					isEqual_Local = false;</span>
+<span class="nc" id="L395">			}</span>
+			else {
+<span class="nc" id="L397">				String strYesNo = &quot;No&quot;;</span>
+<span class="nc bnc" id="L398" title="All 2 branches missed.">				if (null != mapIgnoreCaseSensitive) {</span>
+<span class="nc" id="L399">					String strPath = Util_XMLConvert.getCompletePathForANode(node1).substring(0,  Util_XMLConvert.getCompletePathForANode(node1).lastIndexOf(&quot;/&quot;));</span>
+<span class="nc" id="L400">					strYesNo = mapIgnoreCaseSensitive.get(strPath);</span>
+				}
+
+<span class="nc bnc" id="L403" title="All 4 branches missed.">				if (null != strYesNo &amp;&amp; strYesNo.equalsIgnoreCase(&quot;Yes&quot;)) {</span>
+<span class="nc bnc" id="L404" title="All 2 branches missed.">					if (node1.getTextContent().trim().equalsIgnoreCase(node2.getTextContent().trim()))</span>
+<span class="nc" id="L405">						isEqual_Local = true;</span>
+					else
+<span class="nc" id="L407">						isEqual_Local = false;</span>
+<span class="nc bnc" id="L408" title="All 4 branches missed.">				} else if (null != strYesNo &amp;&amp; (strYesNo.startsWith(&quot;&lt;&quot;)</span>
+<span class="nc bnc" id="L409" title="All 2 branches missed.">						|| strYesNo.startsWith(&quot;&gt;&quot;)</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">						|| strYesNo.startsWith(&quot;Value&quot;)</span>
+<span class="nc bnc" id="L411" title="All 2 branches missed.">						|| strYesNo.startsWith(&quot;Between&quot;))) {</span>
+<span class="nc" id="L412">					String equalityCond[] = strYesNo.split(&quot;,&quot;);</span>
+<span class="nc bnc" id="L413" title="All 4 branches missed.">					if (node1.getTextContent() != null &amp;&amp; !node1.getTextContent().trim().equals(&quot;&quot;)) {</span>
+						// TODO : Check this logic
+<span class="nc bnc" id="L415" title="All 5 branches missed.">						switch (equalityCond[0]) {</span>
+						case &quot;&lt;&quot;:
+<span class="nc" id="L417">							Double nodeVal = Double.parseDouble(node2.getTextContent().trim());</span>
+<span class="nc" id="L418">							Double inputVal = Double.parseDouble(equalityCond[1].trim());</span>
+<span class="nc bnc" id="L419" title="All 2 branches missed.">							if (nodeVal &lt; inputVal)</span>
+<span class="nc" id="L420">								isEqual_Local = true;</span>
+							else
+<span class="nc" id="L422">								isEqual_Local = false;</span>
+<span class="nc" id="L423">							break;</span>
+						case &quot;&gt;&quot;:
+<span class="nc" id="L425">							Double nodeVal1 = Double.parseDouble(node2.getTextContent().trim());</span>
+<span class="nc" id="L426">							Double inputVal1 = Double.parseDouble(equalityCond[1].trim());</span>
+<span class="nc bnc" id="L427" title="All 2 branches missed.">							if (nodeVal1 &gt; inputVal1)</span>
+<span class="nc" id="L428">								isEqual_Local = true;</span>
+							else
+<span class="nc" id="L430">								isEqual_Local = false;</span>
+<span class="nc" id="L431">							break;</span>
+						case &quot;Value&quot;:
+<span class="nc" id="L433">							String nodeVal2 = node2.getTextContent().trim();</span>
+<span class="nc" id="L434">							String inputVal2 = equalityCond[1].trim();</span>
+<span class="nc bnc" id="L435" title="All 2 branches missed.">							if (nodeVal2.equals(inputVal2))</span>
+<span class="nc" id="L436">								isEqual_Local = true;</span>
+							else
+<span class="nc" id="L438">								isEqual_Local = false;</span>
+<span class="nc" id="L439">							break;</span>
+						case &quot;Between&quot;:
+<span class="nc" id="L441">							Double nodeVal3 = Double.parseDouble(node2.getTextContent().trim());</span>
+<span class="nc" id="L442">							Double inputVal3 = Double.parseDouble(equalityCond[1].trim());</span>
+<span class="nc" id="L443">							Double inputVal4 = Double.parseDouble(equalityCond[2].trim());</span>
+<span class="nc bnc" id="L444" title="All 4 branches missed.">							if (nodeVal3 &gt; inputVal3 &amp;&amp; nodeVal3 &lt; inputVal4)</span>
+<span class="nc" id="L445">								isEqual_Local = true;</span>
+							else
+<span class="nc" id="L447">								isEqual_Local = false;</span>
+<span class="nc" id="L448">							break;</span>
+						default:
+							break;
+						}
+					}
+<span class="nc" id="L453">				} else {</span>
+<span class="nc bnc" id="L454" title="All 2 branches missed.">					if (node1.getTextContent().trim().equals(node2.getTextContent().trim()))</span>
+<span class="nc" id="L455">						isEqual_Local = true;</span>
+					else
+<span class="nc" id="L457">						isEqual_Local = false;</span>
+				}
+			}
+		}
+<span class="pc bpc" id="L461" title="1 of 2 branches missed.">		if (lst1.size() != lst2.size())</span>
+<span class="nc" id="L462">			isEqual_Local = false;</span>
+		else {
+<span class="fc" id="L464">			Node node1_child = null;</span>
+<span class="fc" id="L465">			Node node2_child = null;</span>
+<span class="fc" id="L466">			int intDoNotCompareElementCnt = 0;</span>
+<span class="fc bfc" id="L467" title="All 2 branches covered.">			for (node1Ctr = 0; node1Ctr &lt; lst1.size(); node1Ctr++) {</span>
+<span class="fc" id="L468">				node1_child = lst1.get(node1Ctr);</span>
+<span class="pc bpc" id="L469" title="1 of 2 branches missed.">				if (eligibleNodeForValidation(node1_child, lstElementsToExclude)) {</span>
+<span class="fc" id="L470">					boolean blnNodeMatchFound = false;</span>
+<span class="fc bfc" id="L471" title="All 2 branches covered.">					for (node2Ctr = 0; node2Ctr &lt; lst2.size(); node2Ctr++) {</span>
+<span class="fc" id="L472">						node2_child = lst2.get(node2Ctr);</span>
+<span class="pc bpc" id="L473" title="1 of 2 branches missed.">						if (eligibleNodeForValidation(node2_child, lstElementsToExclude)) {</span>
+<span class="fc bfc" id="L474" title="All 2 branches covered.">							if (isAlreadyMatchedNode(lstMatchedPositionsInSecondList, node2Ctr))</span>
+<span class="fc" id="L475">								continue;</span>
+							else
+<span class="fc bfc" id="L477" title="All 2 branches covered.">								if (equal(node1_child, node2_child, lstElementsToExclude, mapIgnoreCaseSensitive)) {</span>
+<span class="fc" id="L478">									lstMatchedPositionsInSecondList.add(new Integer(node2Ctr));</span>
+<span class="fc" id="L479">									blnNodeMatchFound = true;</span>
+<span class="fc" id="L480">									break;</span>
+								}
+						}
+					}
+
+//							If any element from first list is not present in the second list, then there is a mismatch
+<span class="fc bfc" id="L486" title="All 2 branches covered.">					if (!blnNodeMatchFound) {</span>
+<span class="fc" id="L487">						isEqual_Local = false;</span>
+<span class="fc" id="L488">						break;</span>
+					}
+				}
+				else
+<span class="nc" id="L492">					intDoNotCompareElementCnt++;</span>
+			}
+//					If the matched positions count is not same as the number of element in the first child list, then there is a mismatch
+<span class="fc bfc" id="L495" title="All 2 branches covered.">			if ((lstMatchedPositionsInSecondList.size() + intDoNotCompareElementCnt) != lst1.size())</span>
+<span class="fc" id="L496">				isEqual_Local = false;</span>
+		}
+<span class="fc" id="L498">		return isEqual_Local;</span>
+	}
+
+	private static boolean equalTextOrAttributeNodes(Node node1, Node node2, Map&lt;String, String&gt; mapIgnoreCaseSensitive,
+			boolean isEqual) {
+<span class="fc" id="L503">		boolean isEqual_Local = isEqual;</span>
+<span class="fc" id="L504">		String strYesNo = &quot;No&quot;;</span>
+<span class="pc bpc" id="L505" title="1 of 2 branches missed.">		if (null != mapIgnoreCaseSensitive) {</span>
+<span class="fc" id="L506">			String strpath = Util_XMLConvert.getCompletePathForANode(node1).substring(0, Util_XMLConvert.getCompletePathForANode(node1).lastIndexOf(&quot;/&quot;));</span>
+<span class="fc" id="L507">			strYesNo = mapIgnoreCaseSensitive.get(strpath);</span>
+		}
+
+<span class="pc bpc" id="L510" title="3 of 4 branches missed.">		if (null != strYesNo &amp;&amp; strYesNo.equalsIgnoreCase(&quot;Yes&quot;)) {</span>
+<span class="nc bnc" id="L511" title="All 2 branches missed.">			if (node1.getTextContent().trim().equalsIgnoreCase(node2.getTextContent().trim())) {</span>
+<span class="nc" id="L512">				isEqual_Local = true;</span>
+<span class="nc" id="L513">			}</span>
+			else {
+<span class="nc" id="L515">				isEqual_Local = false;</span>
+			}
+<span class="pc bpc" id="L517" title="3 of 4 branches missed.">		} else if (null != strYesNo &amp;&amp; (strYesNo.startsWith(&quot;&lt;&quot;)</span>
+<span class="nc bnc" id="L518" title="All 2 branches missed.">			|| strYesNo.startsWith(&quot;&gt;&quot;)</span>
+<span class="nc bnc" id="L519" title="All 2 branches missed.">			|| strYesNo.startsWith(&quot;Value&quot;)</span>
+<span class="nc bnc" id="L520" title="All 2 branches missed.">			|| strYesNo.startsWith(&quot;Between&quot;))) {</span>
+//					If Node2(Actual XML content) matches the criteria move to matched tab in excel
+<span class="nc" id="L522">			String equalityCond[] = strYesNo.split(&quot;,&quot;);</span>
+<span class="nc bnc" id="L523" title="All 4 branches missed.">			if (node2.getTextContent() != null &amp;&amp; !node2.getTextContent().trim().equals(&quot;&quot;)) {</span>
+<span class="nc bnc" id="L524" title="All 5 branches missed.">				switch (equalityCond[0]) {</span>
+				case &quot;&lt;&quot;:
+<span class="nc" id="L526">					Double nodeVal = Double.parseDouble(node2.getTextContent().trim());</span>
+<span class="nc" id="L527">					Double inputVal = Double.parseDouble(equalityCond[1].trim());</span>
+<span class="nc bnc" id="L528" title="All 2 branches missed.">					if (nodeVal &lt; inputVal)</span>
+<span class="nc" id="L529">						isEqual_Local = true;</span>
+					else
+<span class="nc" id="L531">						isEqual_Local = false;</span>
+<span class="nc" id="L532">					break;</span>
+				case &quot;&gt;&quot;:
+<span class="nc" id="L534">					Double nodeVal1 = Double.parseDouble(node2.getTextContent().trim());</span>
+<span class="nc" id="L535">					Double inputVal1 = Double.parseDouble(equalityCond[1].trim());</span>
+<span class="nc bnc" id="L536" title="All 2 branches missed.">					if (nodeVal1 &gt; inputVal1)</span>
+<span class="nc" id="L537">						isEqual_Local = true;</span>
+					else
+<span class="nc" id="L539">						isEqual_Local = false;</span>
+<span class="nc" id="L540">					break;</span>
+				case &quot;Value&quot;:
+<span class="nc" id="L542">					String nodeVal2 = node2.getTextContent().trim();</span>
+<span class="nc" id="L543">					String inputVal2 = equalityCond[1].trim();</span>
+<span class="nc bnc" id="L544" title="All 2 branches missed.">					if (nodeVal2.equals(inputVal2))</span>
+<span class="nc" id="L545">						isEqual_Local = true;</span>
+					else
+<span class="nc" id="L547">						isEqual_Local = false;</span>
+<span class="nc" id="L548">					break;</span>
+				case &quot;Between&quot;:
+<span class="nc" id="L550">					Double nodeVal3 = Double.parseDouble(node2.getTextContent().trim());</span>
+<span class="nc" id="L551">					Double inputVal3 = Double.parseDouble(equalityCond[1].trim());</span>
+<span class="nc" id="L552">					Double inputVal4 = Double.parseDouble(equalityCond[2].trim());</span>
+<span class="nc bnc" id="L553" title="All 4 branches missed.">					if (nodeVal3 &gt; inputVal3 &amp;&amp; nodeVal3 &lt; inputVal4)</span>
+<span class="nc" id="L554">						isEqual_Local = true;</span>
+					else
+<span class="nc" id="L556">						isEqual_Local = false;</span>
+<span class="nc" id="L557">					break;</span>
+				default:
+					break;
+				}
+			}
+<span class="nc" id="L562">		} else {</span>
+<span class="fc bfc" id="L563" title="All 2 branches covered.">			if (node1.getTextContent().trim().equals(node2.getTextContent().trim()))</span>
+<span class="fc" id="L564">				isEqual_Local = true;</span>
+			else
+<span class="fc" id="L566">				isEqual_Local = false;</span>
+		}
+<span class="fc" id="L568">		return isEqual_Local;</span>
+	}
+
+	private static boolean isAlreadyMatchedNode(List&lt;Integer&gt; lstMatchedPositions, int nodeCtr) {
+<span class="fc" id="L572">		boolean isAlreadyMatchedNode = false;</span>
+<span class="fc bfc" id="L573" title="All 2 branches covered.">		for (Integer intTempPos : lstMatchedPositions)</span>
+<span class="fc bfc" id="L574" title="All 2 branches covered.">			if (intTempPos.intValue() == nodeCtr) {</span>
+<span class="fc" id="L575">				isAlreadyMatchedNode = true;</span>
+<span class="fc" id="L576">				break;</span>
+			}
+<span class="fc" id="L578">		return isAlreadyMatchedNode;</span>
+	}
+
+	private static List&lt;Node&gt; getChildrenWithoutTextNodesIfComplex(Node objNodes, List&lt;String&gt; lstElementsToExclude) {
+<span class="fc" id="L582">		NodeList childNodes = objNodes.getChildNodes();</span>
+<span class="fc" id="L583">		int intNodeListLen = childNodes.getLength();</span>
+<span class="fc" id="L584">		List&lt;Node&gt; lstChildrenWithoutTextNodes = new ArrayList&lt;Node&gt; ();</span>
+<span class="fc" id="L585">		boolean isComplex = false;</span>
+<span class="fc bfc" id="L586" title="All 2 branches covered.">		for (int i=0; i &lt; intNodeListLen; i++) {</span>
+<span class="fc bfc" id="L587" title="All 2 branches covered.">			if (childNodes.item(i).getNodeType() == Node.ELEMENT_NODE) {</span>
+<span class="fc" id="L588">				isComplex = true;</span>
+<span class="fc" id="L589">				break;</span>
+			}
+		}
+<span class="fc bfc" id="L592" title="All 2 branches covered.">		for (int i=0; i&lt;intNodeListLen; i++) {</span>
+<span class="fc bfc" id="L593" title="All 2 branches covered.">			if ((isComplex)</span>
+<span class="fc bfc" id="L594" title="All 2 branches covered.">					&amp;&amp; (childNodes.item(i).getNodeType() != Node.TEXT_NODE)) {</span>
+<span class="fc" id="L595">				String str = childNodes.item(i).getTextContent();</span>
+<span class="pc bpc" id="L596" title="2 of 4 branches missed.">				if ((str != null &amp;&amp; !str.equals(&quot;&quot;))</span>
+<span class="pc bpc" id="L597" title="1 of 2 branches missed.">					&amp;&amp; (eligibleNodeForValidation(childNodes.item(i), lstElementsToExclude))) {</span>
+<span class="fc" id="L598">						lstChildrenWithoutTextNodes.add(childNodes.item(i));</span>
+				}
+<span class="fc" id="L600">			}</span>
+<span class="pc bpc" id="L601" title="1 of 2 branches missed.">			else if (eligibleNodeForValidation(childNodes.item(i), lstElementsToExclude))</span>
+<span class="fc" id="L602">					lstChildrenWithoutTextNodes.add(childNodes.item(i));</span>
+		}
+<span class="fc" id="L604">		return lstChildrenWithoutTextNodes;</span>
+	}
+
+	private static boolean isNumberPresentInMapValue(int intToMatch,
+			Map&lt;Integer, Integer&gt; mapMatchedNodePositions) {
+<span class="fc bfc" id="L609" title="All 2 branches covered.">		for (Map.Entry&lt;Integer, Integer&gt; entry : mapMatchedNodePositions.entrySet()) {</span>
+<span class="fc bfc" id="L610" title="All 2 branches covered.">			if (entry.getValue().intValue() == intToMatch) {</span>
+<span class="fc" id="L611">				return true;</span>
+			}
+		}
+<span class="fc" id="L614">		return false;</span>
+	}
+
+	private static boolean eligibleNodeForValidation(Node objNodeToCheck, List&lt;String&gt; lstElementsToExclude) {
+<span class="fc" id="L618">		boolean isEligibleForValidation = true;</span>
+<span class="pc bpc" id="L619" title="2 of 4 branches missed.">		if (null != lstElementsToExclude &amp;&amp; lstElementsToExclude.size() &gt; 0) {</span>
+<span class="nc" id="L620">			String strElementPath = getCompletePathForANode(objNodeToCheck);</span>
+<span class="nc bnc" id="L621" title="All 2 branches missed.">			for (String strTempElementToExclude : lstElementsToExclude) {</span>
+<span class="nc bnc" id="L622" title="All 2 branches missed.">				if (strTempElementToExclude.equals(strElementPath)) {</span>
+<span class="nc" id="L623">					isEligibleForValidation = false;</span>
+<span class="nc" id="L624">					break;</span>
+				}
+			}
+		}
+<span class="fc" id="L628">		return isEligibleForValidation;</span>
+	}
+
+	private static String getCompletePathForANode(Node objNode) {
+<span class="fc" id="L632">		String strCompletePathForNode = objNode.getNodeName();</span>
+<span class="fc" id="L633">		Node tempNode = objNode;</span>
+<span class="fc bfc" id="L634" title="All 2 branches covered.">		while (null != tempNode.getParentNode()) {</span>
+<span class="fc" id="L635">			tempNode = tempNode.getParentNode();</span>
+<span class="fc bfc" id="L636" title="All 2 branches covered.">			if (tempNode.getNodeName().equals(&quot;#document&quot;))</span>
+<span class="fc" id="L637">				strCompletePathForNode = &quot;/&quot; + strCompletePathForNode;</span>
+			else
+<span class="fc" id="L639">				strCompletePathForNode = tempNode.getNodeName() + &quot;/&quot; + strCompletePathForNode;</span>
+		}
+<span class="fc" id="L641">		return strCompletePathForNode;</span>
+	}
+
+	private static Map&lt;String, String&gt; getAttributeMap(Document doc) {
+<span class="fc" id="L645">		Map&lt;String, String&gt; mapAttributes = new HashMap&lt;String, String&gt;();</span>
+<span class="fc" id="L646">		NodeList nodeList = doc.getElementsByTagName(&quot;*&quot;);</span>
+<span class="fc bfc" id="L647" title="All 2 branches covered.">		for (int i=0; i &lt; nodeList.getLength(); i++) {</span>
+<span class="fc" id="L648">			Node node = nodeList.item(i);</span>
+<span class="pc bpc" id="L649" title="1 of 2 branches missed.">			if (node.getNodeType() == Node.ELEMENT_NODE) {</span>
+<span class="fc" id="L650">				NamedNodeMap mapNamedNode = node.getAttributes();</span>
+<span class="fc" id="L651">				int intNamedNodeSize = mapNamedNode.getLength();</span>
+<span class="pc bpc" id="L652" title="1 of 2 branches missed.">				for (int intCtr = 0; intCtr &lt; intNamedNodeSize; intCtr++) {</span>
+<span class="nc" id="L653">					String strNodeName = mapNamedNode.item(intCtr).getNodeName();</span>
+<span class="nc" id="L654">					String[] arrNameSpace = strNodeName.toLowerCase().split(&quot;:&quot;);</span>
+<span class="nc bnc" id="L655" title="All 2 branches missed.">					if (arrNameSpace.length &gt; 1</span>
+<span class="nc bnc" id="L656" title="All 2 branches missed.">							&amp;&amp; arrNameSpace[0].trim().equalsIgnoreCase(&quot;xmlns&quot;)) {</span>
+<span class="nc" id="L657">						String strNameSpaceKey = null;</span>
+<span class="nc bnc" id="L658" title="All 2 branches missed.">						if (arrNameSpace.length &gt; 1)</span>
+<span class="nc" id="L659">							strNameSpaceKey = arrNameSpace[1];</span>
+						else
+<span class="nc" id="L661">							strNameSpaceKey = &quot;&quot;;</span>
+<span class="nc" id="L662">						String strNameSpaceValue = mapNamedNode.item(intCtr).getNodeValue();</span>
+<span class="nc" id="L663">						mapAttributes.put(strNameSpaceKey, strNameSpaceValue);</span>
+					}
+				}
+			}
+		}
+<span class="fc" id="L668">		return mapAttributes;</span>
+	}
+
+	private static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+<span class="fc bfc" id="L672" title="All 2 branches covered.">		if (null == builder) {</span>
+<span class="fc" id="L673">			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</span>
+<span class="fc" id="L674">			factory.setNamespaceAware(true);</span>
+<span class="fc" id="L675">			builder = factory.newDocumentBuilder();</span>
+		}
+<span class="fc" id="L677">		return builder;</span>
+	}
+
+	public static void printResultsToFile(String strComparisonResultsFile, List&lt;String&gt; lstPassedCSVData, List&lt;String&gt; lstFailedCSVData) {
+<span class="fc" id="L681">		logger.debug(&quot;Start : XMLDataConverter.printResultsToFile(...)&quot;);</span>
+<span class="fc" id="L682">		HSSFWorkbook workbook = new HSSFWorkbook();</span>
+		try {
+<span class="fc" id="L684">			HSSFSheet sheet = workbook.createSheet(&quot;MatchedData&quot;);</span>
+<span class="pc bpc" id="L685" title="1 of 2 branches missed.">			if (null != lstPassedCSVData) {</span>
+<span class="fc" id="L686">				short intRowCnt = 0;</span>
+<span class="fc bfc" id="L687" title="All 2 branches covered.">				for (String strPassedCSVROWData : lstPassedCSVData) {</span>
+<span class="fc" id="L688">					String[] arrpassedCSVRowData = strPassedCSVROWData.split(&quot;,&quot;);</span>
+<span class="fc" id="L689">					HSSFRow rowhead = sheet.createRow(intRowCnt++);</span>
+<span class="fc bfc" id="L690" title="All 2 branches covered.">					for (int intColCnt = 0; intColCnt &lt; arrpassedCSVRowData.length; intColCnt++) {</span>
+<span class="fc" id="L691">						rowhead.createCell(intColCnt).setCellValue(arrpassedCSVRowData[intColCnt]);</span>
+					}
+				}
+			}
+<span class="fc" id="L695">			sheet = workbook.createSheet(&quot;MismatchedData&quot;);</span>
+<span class="pc bpc" id="L696" title="1 of 2 branches missed.">			if(null != lstFailedCSVData) {</span>
+<span class="fc" id="L697">				short intRowCnt = 0;</span>
+<span class="fc bfc" id="L698" title="All 2 branches covered.">				for (String strFailedCSVROWData : lstFailedCSVData) {</span>
+<span class="fc" id="L699">					String[] arrFailedCSVRowData = strFailedCSVROWData.split(&quot;,&quot;);</span>
+<span class="fc" id="L700">					HSSFRow rowhead = sheet.createRow(intRowCnt++);</span>
+<span class="fc bfc" id="L701" title="All 2 branches covered.">					for (int intColCnt = 0; intColCnt &lt; arrFailedCSVRowData.length; intColCnt++) {</span>
+<span class="fc" id="L702">						rowhead.createCell(intColCnt).setCellValue(arrFailedCSVRowData[intColCnt]);</span>
+					}
+				}
+			}
+<span class="fc" id="L706">			FileOutputStream fileOut = new FileOutputStream(strComparisonResultsFile);</span>
+<span class="fc" id="L707">			workbook.write(fileOut);</span>
+<span class="fc" id="L708">			fileOut.close();</span>
+<span class="pc" id="L709">		} catch (Exception e) {</span>
+<span class="nc" id="L710">			logger.error(&quot;706 : XMLDataConverter.printResultsToFile(...) : &quot; + e);</span>
+		}
+		finally {
+<span class="pc bpc" id="L713" title="1 of 2 branches missed.">			if (null != workbook) {</span>
+				try {
+<span class="fc" id="L715">					workbook.close();</span>
+<span class="pc" id="L716">				} catch (IOException e) {</span>
+<span class="nc" id="L717">					logger.error(&quot;713 : XMLDataConverter.printResultsToFile(...) : IOException e : &quot; + e);</span>
+				}
+			}
+		}
+<span class="fc" id="L721">		logger.debug(&quot;End : XMLDataConverter.printResultsToFile(...)&quot;);</span>
+<span class="fc" id="L722">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

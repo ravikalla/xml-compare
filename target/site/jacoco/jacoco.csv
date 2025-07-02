@@ -1,0 +1,8 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+xml-compare,in.ravikalla.xml_compare.util,CommonUtil,3,36,0,2,1,9,1,2,1,1
+xml-compare,in.ravikalla.xml_compare.util,ConvertXMLToFullPathInCSV,49,462,5,55,15,101,5,36,1,10
+xml-compare,in.ravikalla.xml_compare.util,Util_XMLConvert,156,89,37,13,21,22,22,7,1,3
+xml-compare,in.ravikalla.xml_compare.util,XMLDataConverter,583,1450,141,153,121,318,94,82,1,25
+xml-compare,in.ravikalla.xml_compare,CompareXMLAndXML,164,281,13,11,35,69,11,9,2,6
+xml-compare,in.ravikalla.xml_compare.dto,XMLToXMLComparisonResultsHolderDTO,0,3,0,0,0,1,0,1,0,1
+xml-compare,in.ravikalla.xml_compare.dto,SimpleNamespaceContext,14,12,0,0,3,4,3,1,3,1

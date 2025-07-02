@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Util_XMLConvert.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xml-compare</a> &gt; <a href="index.source.html" class="el_package">in.ravikalla.xml_compare.util</a> &gt; <span class="el_source">Util_XMLConvert.java</span></div><h1>Util_XMLConvert.java</h1><pre class="source lang-java linenums">package in.ravikalla.xml_compare.util;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+<span class="nc" id="L9">public class Util_XMLConvert {</span>
+
+	public static Map&lt;String, String&gt; convertTrimmableElementsToMap(String strTrimElements, String strElementsSeparator, String strValueSeparator) {
+<span class="fc" id="L12">		Map&lt;String, String&gt; mapTrimmableElements = new HashMap&lt;String, String&gt;();</span>
+<span class="pc bpc" id="L13" title="3 of 4 branches missed.">		if (null != strTrimElements &amp;&amp; strTrimElements.trim().length() &gt; 0) {</span>
+<span class="nc" id="L14">			String[] arrElements = strTrimElements.split(strElementsSeparator);</span>
+<span class="nc bnc" id="L15" title="All 4 branches missed.">			if (null != arrElements &amp;&amp; arrElements.length &gt; 0) {</span>
+<span class="nc bnc" id="L16" title="All 2 branches missed.">				for (String strElementValuePairs : arrElements) {</span>
+<span class="nc bnc" id="L17" title="All 4 branches missed.">					if (null != strElementValuePairs &amp;&amp; strElementValuePairs.length() &gt; 0) {</span>
+<span class="nc" id="L18">						String[] arrElementValuePairs = strElementValuePairs.split(strValueSeparator);</span>
+<span class="nc bnc" id="L19" title="All 4 branches missed.">						if (null != arrElementValuePairs &amp;&amp; arrElementValuePairs.length &gt; 0) {</span>
+<span class="nc bnc" id="L20" title="All 4 branches missed.">							if (null != arrElementValuePairs[1] &amp;&amp; arrElementValuePairs[1].equalsIgnoreCase(&quot;Between&quot;)) {</span>
+<span class="nc" id="L21">								mapTrimmableElements.put(arrElementValuePairs[0], arrElementValuePairs[1] + &quot;,&quot; + arrElementValuePairs[2] + &quot;,&quot; + arrElementValuePairs[3]);</span>
+<span class="nc" id="L22">							}</span>
+<span class="nc bnc" id="L23" title="All 2 branches missed.">							else if (null != arrElementValuePairs[1]</span>
+<span class="nc bnc" id="L24" title="All 4 branches missed.">									&amp;&amp; (arrElementValuePairs[1].equals(&quot;&lt;&quot;) || arrElementValuePairs[1].equals(&quot;&gt;&quot;)</span>
+<span class="nc bnc" id="L25" title="All 2 branches missed.">											|| arrElementValuePairs[1].equals(&quot;Value&quot;))) {</span>
+<span class="nc" id="L26">								mapTrimmableElements.put(arrElementValuePairs[0], arrElementValuePairs[1] + &quot;,&quot; + arrElementValuePairs[2]);</span>
+<span class="nc" id="L27">							}</span>
+							else {
+<span class="nc" id="L29">								mapTrimmableElements.put(arrElementValuePairs[0], arrElementValuePairs[1]);</span>
+							}
+						}
+					}
+				}
+			}
+		}
+<span class="fc" id="L36">		return mapTrimmableElements;</span>
+	}
+
+	public static void trimValueIfApplicable(NodeList lstChildNodeList, Map&lt;String, String&gt; mapTrimElements) {
+<span class="pc bpc" id="L40" title="1 of 4 branches missed.">		if (null != lstChildNodeList &amp;&amp; lstChildNodeList.getLength() &gt; 0) {</span>
+<span class="fc" id="L41">			int intChildrenLength = lstChildNodeList.getLength();</span>
+<span class="fc" id="L42">			Node objChildNode = null;</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">			for (int intChildCtr = 0; intChildCtr &lt; intChildrenLength; intChildCtr++) {</span>
+<span class="fc" id="L44">				objChildNode = lstChildNodeList.item(intChildCtr);</span>
+<span class="fc" id="L45">				String strCompletePath = Util_XMLConvert.getCompletePathForANode(objChildNode);</span>
+<span class="pc bpc" id="L46" title="2 of 4 branches missed.">				if (null != strCompletePath &amp;&amp; strCompletePath.length() &gt; 0) {</span>
+<span class="fc" id="L47">					String strValue = mapTrimElements.get(strCompletePath);</span>
+<span class="pc bpc" id="L48" title="3 of 4 branches missed.">					if (null != strValue &amp;&amp; strValue.length() &gt; 0) {</span>
+<span class="nc" id="L49">						int intValueLength = Integer.parseInt(strValue);</span>
+<span class="nc" id="L50">						String strTextContent = objChildNode.getTextContent();</span>
+
+<span class="nc bnc" id="L52" title="All 2 branches missed.">						if (strTextContent.length() &gt;= intValueLength) {</span>
+<span class="nc" id="L53">							strTextContent = strTextContent.substring(0, intValueLength);</span>
+<span class="nc" id="L54">							objChildNode.setTextContent(strTextContent);</span>
+						}
+					}
+				}
+<span class="fc" id="L58">				trimValueIfApplicable(objChildNode.getChildNodes(), mapTrimElements);</span>
+			}
+		}
+<span class="fc" id="L61">	}</span>
+
+	public static String getCompletePathForANode(Node objNode) {
+<span class="fc" id="L64">		String strCompletePathForNode = objNode.getNodeName();</span>
+<span class="fc" id="L65">		Node tempNode = objNode;</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">		while (tempNode.getParentNode() != null) {</span>
+<span class="fc" id="L67">			tempNode = tempNode.getParentNode();</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">			if (tempNode.getNodeName().equals(&quot;#document&quot;))</span>
+<span class="fc" id="L69">				strCompletePathForNode = &quot;/&quot; + strCompletePathForNode;</span>
+			else
+<span class="fc" id="L71">				strCompletePathForNode = tempNode.getNodeName() + &quot;/&quot; + strCompletePathForNode;</span>
+		}
+<span class="fc" id="L73">		return strCompletePathForNode;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

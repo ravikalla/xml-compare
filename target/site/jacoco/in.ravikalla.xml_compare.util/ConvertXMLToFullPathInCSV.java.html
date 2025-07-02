@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConvertXMLToFullPathInCSV.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xml-compare</a> &gt; <a href="index.source.html" class="el_package">in.ravikalla.xml_compare.util</a> &gt; <span class="el_source">ConvertXMLToFullPathInCSV.java</span></div><h1>ConvertXMLToFullPathInCSV.java</h1><pre class="source lang-java linenums">package in.ravikalla.xml_compare.util;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+<span class="nc" id="L19">public class ConvertXMLToFullPathInCSV {</span>
+<span class="fc" id="L20">	private final static Logger logger = LogManager.getLogger(ConvertXMLToFullPathInCSV.class);</span>
+	public static List&lt;String&gt; getFirstLevelOfReapeatingElements(String strXML1, String strXML2) {
+<span class="fc" id="L22">		List&lt;Node&gt; lstResultNodes = null;</span>
+<span class="fc" id="L23">		List&lt;String&gt; lstResultNodeNames_Temp = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L24">		List&lt;String&gt; lstResultNodeNames = new ArrayList&lt;String&gt;();</span>
+		try {
+			// Create document
+<span class="fc" id="L27">			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();</span>
+			Document document;
+<span class="fc" id="L29">			InputStream is = null;</span>
+
+<span class="fc" id="L31">			is = new ByteArrayInputStream(strXML1.getBytes());</span>
+<span class="fc" id="L32">			document = domFactory.newDocumentBuilder().parse(is);</span>
+
+			// List of all nodes containing a value
+<span class="fc" id="L35">			document.getDocumentElement().normalize();</span>
+<span class="fc" id="L36">			lstResultNodes = getFirstRepeatingAndLeafNodes(document);</span>
+			// Get list of names from list of nodes
+<span class="fc bfc" id="L38" title="All 2 branches covered.">			for (Node objNode : lstResultNodes) {</span>
+<span class="fc" id="L39">				StringBuilder strNodePath = new StringBuilder(objNode.getNodeName());</span>
+				// Traverse all parents and prepend their names to path
+<span class="fc" id="L41">				objNode = objNode.getParentNode();</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">				while (objNode.getNodeType() != Node.DOCUMENT_NODE) {</span>
+<span class="fc" id="L43">					strNodePath.insert(0,  objNode.getNodeName() + '/');</span>
+<span class="fc" id="L44">					objNode = objNode.getParentNode();</span>
+				}
+<span class="fc" id="L46">				strNodePath.insert(0, '/');</span>
+
+<span class="fc" id="L48">				lstResultNodeNames_Temp = addStringToListIfNotAdded(strNodePath.toString(), lstResultNodeNames_Temp);</span>
+			}
+<span class="fc" id="L50">			is = new ByteArrayInputStream(strXML2.getBytes());</span>
+<span class="fc" id="L51">			document= domFactory.newDocumentBuilder().parse(is);</span>
+
+			// List of all nodes containing a value
+<span class="fc" id="L54">			document.getDocumentElement().normalize();</span>
+<span class="fc" id="L55">			lstResultNodes = getFirstRepeatingAndLeafNodes(document);</span>
+
+			// Get list of names from list of Nodes
+<span class="fc bfc" id="L58" title="All 2 branches covered.">			for (Node objNode : lstResultNodes) {</span>
+<span class="fc" id="L59">				StringBuilder strNodePath = new StringBuilder(objNode.getNodeName());</span>
+				// Traverse all parents and prepend their names to path
+<span class="fc" id="L61">				objNode = objNode.getParentNode();</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">				while(objNode.getNodeType() != Node.DOCUMENT_NODE) {</span>
+<span class="fc" id="L63">					strNodePath.insert(0,  objNode.getNodeName() + '/');</span>
+<span class="fc" id="L64">					objNode = objNode.getParentNode();</span>
+				}
+<span class="fc" id="L66">				strNodePath.insert(0,  '/');</span>
+
+<span class="fc" id="L68">				lstResultNodeNames_Temp = addStringToListIfNotAdded(strNodePath.toString(), lstResultNodeNames_Temp);</span>
+			}
+			// Convert list to a string with a separator
+<span class="fc bfc" id="L71" title="All 2 branches covered.">			for (int i=0; i &lt; lstResultNodeNames_Temp.size(); i++) {</span>
+<span class="fc" id="L72">				lstResultNodeNames.add(lstResultNodeNames_Temp.get(i));</span>
+			}
+<span class="pc" id="L74">		} catch (SAXException e) {</span>
+<span class="nc" id="L75">			logger.error(&quot;72 : ConvertXMLToFullPathInCSV.getFirstLevelOfReapeatingElements(...)&quot;</span>
+<span class="nc" id="L76">					+ &quot; : SAXException e : &quot; + e);</span>
+<span class="nc" id="L77">		} catch (IOException e) {</span>
+<span class="nc" id="L78">			logger.error(&quot;75 : ConvertXMLToFullPathInCSV.getFirstLevelOfReapeatingElements(...)&quot;</span>
+<span class="nc" id="L79">					+ &quot; : IOException e : &quot; + e);</span>
+<span class="nc" id="L80">		} catch (ParserConfigurationException e) {</span>
+<span class="nc" id="L81">			logger.error(&quot;80 : ConvertXMLToFullPathInCSV.getFirstLevelOfReapeatingElements(...)&quot;</span>
+<span class="nc" id="L82">					+ &quot; : ParserConfigurationException e : &quot; + e);</span>
+		}
+<span class="fc" id="L84">		return lstResultNodeNames;</span>
+	}
+
+	private static List&lt;String&gt; addStringToListIfNotAdded(String strToCheck, List&lt;String&gt; lst) {
+<span class="fc" id="L88">		int intElementPosToReplace = -1;</span>
+<span class="fc" id="L89">		boolean blnExists = false;</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">		for (int i=0; i &lt; lst.size(); i++) {</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">			if (lst.get(0).indexOf(strToCheck) == 0) {</span>
+<span class="fc" id="L92">				blnExists = true;</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">				if (lst.get(i).length() &gt; strToCheck.length()) {</span>
+<span class="nc" id="L94">					intElementPosToReplace = i;</span>
+				}
+<span class="nc" id="L96">				break;</span>
+			}
+		}
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">		if (-1 != intElementPosToReplace) {</span>
+<span class="nc" id="L100">			lst.remove(intElementPosToReplace);</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">			if (!blnExists)</span>
+<span class="nc" id="L102">				lst.add(strToCheck);</span>
+<span class="nc" id="L103">		}</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">		else if (!blnExists)</span>
+<span class="fc" id="L105">			lst.add(strToCheck);</span>
+<span class="fc" id="L106">		return lst;</span>
+	}
+
+	private static List&lt;Node&gt; getFirstRepeatingAndLeafNodes(Node node) {
+<span class="fc" id="L110">		NodeList lstChildren = node.getChildNodes();</span>
+<span class="fc" id="L111">		List&lt;Node&gt; lstRepeatingNodes = getRepeatedNodes(lstChildren);</span>
+<span class="fc" id="L112">		List&lt;Node&gt; lstNonRepeatingNodes = getNonRepeatedNodes(lstChildren, lstRepeatingNodes);</span>
+<span class="fc" id="L113">		List&lt;Node&gt; lstNonRepeatingLeafNodes = getNonRepeatingLeafNodes(lstNonRepeatingNodes);</span>
+<span class="fc" id="L114">		List&lt;Node&gt; lstRepeatingAndLeafNodes = new ArrayList&lt;Node&gt;();</span>
+<span class="fc" id="L115">		lstRepeatingAndLeafNodes.addAll(lstRepeatingNodes);</span>
+<span class="fc" id="L116">		lstRepeatingAndLeafNodes.addAll(lstNonRepeatingLeafNodes);</span>
+<span class="fc" id="L117">		List&lt;Node&gt; lstNonRepeatingWithoutLeafNodes = getNonRepeatingWithoutLeafNodes(lstNonRepeatingNodes, lstNonRepeatingLeafNodes);</span>
+
+<span class="fc bfc" id="L119" title="All 2 branches covered.">		for (Node objNonRepeatingNonLeafNode : lstNonRepeatingWithoutLeafNodes) {</span>
+<span class="fc" id="L120">			lstRepeatingAndLeafNodes.addAll(getFirstRepeatingAndLeafNodes(objNonRepeatingNonLeafNode));</span>
+		}
+<span class="fc" id="L122">		return lstRepeatingAndLeafNodes;</span>
+	}
+
+	private static List&lt;Node&gt; getNonRepeatingWithoutLeafNodes(List&lt;Node&gt; lstNonRepeatingNodes,
+			List&lt;Node&gt; lstNonRepeatingLeafNodes) {
+<span class="fc" id="L127">		List&lt;Node&gt; lstNonRepeatingWithoutLeafNodes = new ArrayList&lt;Node&gt;();</span>
+		boolean blnNodeIsLeaf;
+<span class="fc bfc" id="L129" title="All 2 branches covered.">		for (Node objNonRepeatingNode : lstNonRepeatingNodes) {</span>
+<span class="fc" id="L130">			blnNodeIsLeaf = false;</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">			for (Node objNonRepeatingLeafNode : lstNonRepeatingLeafNodes) {</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">				if (objNonRepeatingNode.getNodeName().equals(objNonRepeatingLeafNode.getNodeName())) {</span>
+<span class="fc" id="L133">					blnNodeIsLeaf = true;</span>
+<span class="fc" id="L134">					break;</span>
+				}
+			}
+<span class="fc bfc" id="L137" title="All 2 branches covered.">			if (!blnNodeIsLeaf)</span>
+<span class="fc" id="L138">				lstNonRepeatingWithoutLeafNodes.add(objNonRepeatingNode);</span>
+		}
+<span class="fc" id="L140">		return lstNonRepeatingWithoutLeafNodes;</span>
+	}
+
+	private static List&lt;Node&gt; getNonRepeatingLeafNodes(List&lt;Node&gt; lstNonRepeatingNodes) {
+<span class="fc" id="L144">		List&lt;Node&gt; lstNonRepeatingLeafNode = new ArrayList&lt;Node&gt; ();</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">		for (Node objNonRepeatingNode : lstNonRepeatingNodes) {</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">			if (isLeafNode(objNonRepeatingNode)) {</span>
+<span class="fc" id="L147">				lstNonRepeatingLeafNode.add(objNonRepeatingNode);</span>
+			}
+		}
+<span class="fc" id="L150">		return lstNonRepeatingLeafNode;</span>
+	}
+
+	private static boolean isLeafNode(Node objNonRepeatingNode) {
+<span class="fc" id="L154">		NodeList lst = objNonRepeatingNode.getChildNodes();</span>
+<span class="fc bfc" id="L155" title="All 4 branches covered.">		return ((lst.getLength() == 1) &amp;&amp; (lst.item(0).getNodeType() == Node.TEXT_NODE));</span>
+	}
+
+	private static List&lt;Node&gt; getNonRepeatedNodes(NodeList objNodeList, List&lt;Node&gt; lstRepeatingNodes) {
+<span class="fc" id="L159">		List&lt;Node&gt; lstNonRepeatedNodes = new ArrayList&lt;Node&gt;();</span>
+<span class="fc" id="L160">		Node objNodeFromEntireList= null;</span>
+		boolean blnNodeExistInRepeatingList;
+<span class="fc bfc" id="L162" title="All 2 branches covered.">		for (int intNodeList_Ctr = 0; intNodeList_Ctr &lt; objNodeList.getLength(); intNodeList_Ctr++) {</span>
+<span class="fc" id="L163">			objNodeFromEntireList = objNodeList.item(intNodeList_Ctr);</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">			if (objNodeFromEntireList.getNodeType() == Node.ELEMENT_NODE) {</span>
+<span class="fc" id="L165">				blnNodeExistInRepeatingList = false;</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">				for (Node objNodeFromRepeatingList : lstRepeatingNodes) {</span>
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">					if (objNodeFromEntireList.getNodeName().equals(objNodeFromRepeatingList.getNodeName())) {</span>
+<span class="fc" id="L168">						blnNodeExistInRepeatingList = true;</span>
+<span class="fc" id="L169">						break;</span>
+					}
+				}
+<span class="fc bfc" id="L172" title="All 2 branches covered.">				if (!blnNodeExistInRepeatingList)</span>
+<span class="fc" id="L173">					lstNonRepeatedNodes.add(objNodeFromEntireList);</span>
+			}
+		}
+<span class="fc" id="L176">		return lstNonRepeatedNodes;</span>
+	}
+
+	private static List&lt;Node&gt; getRepeatedNodes(NodeList lstChildren) {
+<span class="fc" id="L180">		List&lt;Node&gt; lstUnionOfNodes = new ArrayList&lt;Node&gt;();</span>
+<span class="fc" id="L181">		List&lt;Node&gt; lstRepeatingNodes = new ArrayList&lt;Node&gt;();</span>
+		Node objNode;
+		String strNodeName_Temp;
+<span class="fc bfc" id="L184" title="All 2 branches covered.">		for (int i=0; i &lt; lstChildren.getLength(); i++) {</span>
+<span class="fc" id="L185">			objNode = lstChildren.item(i);</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">			if (objNode.getNodeType() == Node.ELEMENT_NODE) {</span>
+<span class="fc" id="L187">				strNodeName_Temp = objNode.getNodeName();</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">				if (nodeExistsInList(strNodeName_Temp, lstUnionOfNodes))</span>
+<span class="fc" id="L189">					lstRepeatingNodes.add(objNode);</span>
+				else
+<span class="fc" id="L191">					lstUnionOfNodes.add(objNode);</span>
+			}
+		}
+<span class="fc" id="L194">		return lstRepeatingNodes;</span>
+	}
+
+	private static boolean nodeExistsInList(String strNodeName_Temp, List&lt;Node&gt; lstUnionOfNodes) {
+<span class="fc" id="L198">		boolean nodeExistsInList = false;</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">		for (Node objNode_Temp : lstUnionOfNodes) {</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">			if (objNode_Temp.getNodeName().equals(strNodeName_Temp)) {</span>
+<span class="fc" id="L201">				nodeExistsInList = true;</span>
+<span class="fc" id="L202">				break;</span>
+			}
+		}
+<span class="fc" id="L205">		return nodeExistsInList;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
