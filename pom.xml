@@ -70,10 +70,10 @@
   </dependencies>
   <build>
 		<plugins>
-		<!--
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.4.1</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -82,20 +82,10 @@
 					</archive>
 				</configuration>
 			</plugin>
-		-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.9</version>
-				<configuration>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>false</downloadJavadocs>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4.1</version>
+				<version>3.7.1</version>
 				<configuration>
 					<!-- get all project dependencies -->
 					<descriptorRefs>
