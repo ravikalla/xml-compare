@@ -1,0 +1,64 @@
+{
+  "name": "xml-comparison",
+  "version": "1.0.0",
+  "description": "MCP Server for XML File Comparison - Compare XML files using StAX streaming parser with multiple output formats",
+  "author": "Ravi Kalla",
+  "license": "MIT",
+  "homepage": "https://github.com/ravikalla/xml-compare",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ravikalla/xml-compare.git"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "xml-comparison",
+    "claude-desktop",
+    "spring-ai",
+    "java",
+    "stax-parser",
+    "file-comparison"
+  ],
+  "categories": [
+    "development",
+    "productivity",
+    "data-processing"
+  ],
+  "runtime": "java",
+  "entry": {
+    "command": "java",
+    "args": ["-jar", "target/xml-comparison-1.0.0.jar"]
+  },
+  "tools": [
+    {
+      "name": "compare_xml_files",
+      "description": "Compare two XML files using StAX streaming parser and return results in specified format (text, json, excel)"
+    },
+    {
+      "name": "compare_xml_files_custom_path", 
+      "description": "Compare two XML files using StAX streaming parser and return results in specified format with custom output file path"
+    },
+    {
+      "name": "validate_xml_file",
+      "description": "Validate if a file is a well-formed XML file"
+    },
+    {
+      "name": "get_xml_file_info",
+      "description": "Get basic information about an XML file (size, element count, structure)"
+    }
+  ],
+  "setup": {
+    "instructions": [
+      "Install Java 17 or higher",
+      "Clone the xml-compare repository",
+      "Navigate to mcp-xml-comparison directory",
+      "Run 'mvn clean package' to build the JAR",
+      "Configure Claude Desktop with the JAR path",
+      "Restart Claude Desktop"
+    ],
+    "requirements": {
+      "java": ">=17",
+      "maven": ">=3.6"
+    }
+  }
+}

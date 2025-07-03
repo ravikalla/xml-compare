@@ -1,0 +1,6 @@
+com/ravikalla/xmlcomparison/util/StreamingXMLComparator$ComparisonResultData.class
+com/ravikalla/xmlcomparison/XmlComparisonMcpApplication.class
+com/ravikalla/xmlcomparison/model/XmlFileInfo.class
+com/ravikalla/xmlcomparison/util/StreamingXMLComparator.class
+com/ravikalla/xmlcomparison/model/ComparisonResult.class
+com/ravikalla/xmlcomparison/service/XmlComparisonService.class

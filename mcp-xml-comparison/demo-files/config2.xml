@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Database>
+        <Host>localhost</Host>
+        <Port>5432</Port>
+        <Name>staging_db</Name>
+        <User>admin</User>
+    </Database>
+    <Cache>
+        <Enabled>false</Enabled>
+        <TTL>1800</TTL>
+        <MaxSize>500</MaxSize>
+    </Cache>
+    <Logging>
+        <Level>DEBUG</Level>
+        <File>/var/log/app.log</File>
+    </Logging>
+</Configuration>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Database>
+        <Host>localhost</Host>
+        <Port>5432</Port>
+        <Name>production_db</Name>
+        <User>admin</User>
+    </Database>
+    <Cache>
+        <Enabled>true</Enabled>
+        <TTL>3600</TTL>
+        <MaxSize>1000</MaxSize>
+    </Cache>
+    <Logging>
+        <Level>INFO</Level>
+        <File>/var/log/app.log</File>
+    </Logging>
+</Configuration>
