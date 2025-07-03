@@ -3,7 +3,10 @@ package com.ravikalla.xmlcomparison.util;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -192,6 +195,176 @@ public class StreamingXMLComparator {
         }
     }
     
+    /**
+     * Compare two XML files using canonical (order-agnostic) comparison
+     * Based on the existing XMLDataConverter logic but using StAX for memory efficiency
+     */
+    public static boolean compareXMLFilesCanonical(String xmlFile1, String xmlFile2) 
+            throws IOException, XMLStreamException {
+        logger.info("Starting StAX canonical comparison of XML files: {} and {}", xmlFile1, xmlFile2);
+        
+        // Extract normalized element structures from both files
+        List<ElementStructure> elements1 = extractElementStructures(xmlFile1);
+        List<ElementStructure> elements2 = extractElementStructures(xmlFile2);
+        
+        // Perform order-agnostic comparison
+        return compareElementStructuresCanonically(elements1, elements2);
+    }
+    
+    private static List<ElementStructure> extractElementStructures(String xmlFile) 
+            throws IOException, XMLStreamException {
+        List<ElementStructure> elements = new ArrayList<>();
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+        
+        try (FileInputStream fis = new FileInputStream(xmlFile)) {
+            XMLStreamReader reader = factory.createXMLStreamReader(fis);
+            
+            while (reader.hasNext()) {
+                int event = reader.next();
+                
+                if (event == XMLStreamConstants.START_ELEMENT) {
+                    ElementStructure element = parseElement(reader);
+                    if (element != null) {
+                        elements.add(element);
+                    }
+                }
+            }
+            reader.close();
+        }
+        
+        return elements;
+    }
+    
+    private static ElementStructure parseElement(XMLStreamReader reader) throws XMLStreamException {
+        String name = reader.getLocalName();
+        Map<String, String> attributes = new HashMap<>();
+        List<ElementStructure> children = new ArrayList<>();
+        StringBuilder textContent = new StringBuilder();
+        
+        // Read attributes
+        for (int i = 0; i < reader.getAttributeCount(); i++) {
+            attributes.put(reader.getAttributeLocalName(i), reader.getAttributeValue(i));
+        }
+        
+        // Read element content
+        while (reader.hasNext()) {
+            int event = reader.next();
+            
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT:
+                    ElementStructure child = parseElement(reader);
+                    if (child != null) {
+                        children.add(child);
+                    }
+                    break;
+                    
+                case XMLStreamConstants.CHARACTERS:
+                case XMLStreamConstants.CDATA:
+                    String text = reader.getText().trim();
+                    if (!text.isEmpty()) {
+                        textContent.append(text);
+                    }
+                    break;
+                    
+                case XMLStreamConstants.END_ELEMENT:
+                    if (reader.getLocalName().equals(name)) {
+                        return new ElementStructure(name, attributes, children, textContent.toString().trim());
+                    }
+                    break;
+            }
+        }
+        
+        return new ElementStructure(name, attributes, children, textContent.toString().trim());
+    }
+    
+    private static boolean compareElementStructuresCanonically(List<ElementStructure> elements1, 
+                                                              List<ElementStructure> elements2) {
+        if (elements1.size() != elements2.size()) {
+            return false;
+        }
+        
+        // Track which elements in list2 have been matched
+        List<Integer> matchedPositions = new ArrayList<>();
+        
+        // For each element in list1, find a matching element in list2
+        for (ElementStructure element1 : elements1) {
+            boolean foundMatch = false;
+            
+            for (int i = 0; i < elements2.size(); i++) {
+                if (matchedPositions.contains(i)) {
+                    continue; // Already matched
+                }
+                
+                if (elementsEqualCanonically(element1, elements2.get(i))) {
+                    matchedPositions.add(i);
+                    foundMatch = true;
+                    break;
+                }
+            }
+            
+            if (!foundMatch) {
+                return false;
+            }
+        }
+        
+        return matchedPositions.size() == elements1.size();
+    }
+    
+    private static boolean elementsEqualCanonically(ElementStructure elem1, ElementStructure elem2) {
+        // Compare element names
+        if (!Objects.equals(elem1.name, elem2.name)) {
+            return false;
+        }
+        
+        // Compare attributes
+        if (!Objects.equals(elem1.attributes, elem2.attributes)) {
+            return false;
+        }
+        
+        // Compare text content
+        if (!Objects.equals(elem1.textContent, elem2.textContent)) {
+            return false;
+        }
+        
+        // Compare children canonically (order-agnostic)
+        return compareElementStructuresCanonically(elem1.children, elem2.children);
+    }
+    
+    /**
+     * Lightweight element structure for canonical comparison
+     */
+    private static class ElementStructure {
+        final String name;
+        final Map<String, String> attributes;
+        final List<ElementStructure> children;
+        final String textContent;
+        
+        ElementStructure(String name, Map<String, String> attributes, 
+                        List<ElementStructure> children, String textContent) {
+            this.name = name;
+            this.attributes = new HashMap<>(attributes);
+            this.children = new ArrayList<>(children);
+            this.textContent = textContent;
+        }
+        
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            
+            ElementStructure that = (ElementStructure) obj;
+            return Objects.equals(name, that.name) &&
+                   Objects.equals(attributes, that.attributes) &&
+                   Objects.equals(textContent, that.textContent) &&
+                   compareElementStructuresCanonically(children, that.children);
+        }
+        
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, attributes, textContent);
+        }
+    }
+
     /**
      * Data class to hold comparison results
      */

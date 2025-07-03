@@ -68,13 +68,6 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
-        <!-- XMLUnit for semantic XML comparison -->
-        <dependency>
-            <groupId>org.xmlunit</groupId>
-            <artifactId>xmlunit-core</artifactId>
-            <version>2.10.0</version>
-        </dependency>
-
         <!-- Log4j2 for logging -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

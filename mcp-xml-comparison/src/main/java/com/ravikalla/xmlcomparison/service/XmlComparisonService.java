@@ -14,14 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.stream.StreamSource;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xmlunit.builder.DiffBuilder;
-import org.xmlunit.diff.Diff;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -409,44 +401,7 @@ public class XmlComparisonService {
     }
 
     private boolean compareXmlFilesSemantically(String file1Path, String file2Path) throws Exception {
-        try {
-            // Use XMLUnit to compare XML files semantically
-            Diff diff = DiffBuilder.compare(new StreamSource(new File(file1Path)))
-                    .withTest(new StreamSource(new File(file2Path)))
-                    .ignoreWhitespace()
-                    .ignoreElementContentWhitespace()
-                    .ignoreComments()
-                    .normalizeWhitespace()
-                    .checkForSimilar()
-                    .build();
-            
-            return !diff.hasDifferences();
-            
-        } catch (Exception e) {
-            logger.error("Error in semantic XML comparison: {}", e.getMessage(), e);
-            // Fallback to simple content comparison if XMLUnit fails
-            return compareXmlFilesContentOnly(file1Path, file2Path);
-        }
-    }
-
-    private boolean compareXmlFilesContentOnly(String file1Path, String file2Path) throws Exception {
-        // Simple fallback: normalize and compare XML content
-        String content1 = normalizeXmlContent(file1Path);
-        String content2 = normalizeXmlContent(file2Path);
-        return content1.equals(content2);
-    }
-
-    private String normalizeXmlContent(String filePath) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setIgnoringElementContentWhitespace(true);
-        factory.setIgnoringComments(true);
-        
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(new File(filePath));
-        
-        // Normalize the document
-        doc.getDocumentElement().normalize();
-        
-        return doc.getDocumentElement().getTextContent().trim().replaceAll("\\s+", " ");
+        // Use StAX-based canonical comparison inspired by existing XMLDataConverter logic
+        return StreamingXMLComparator.compareXMLFilesCanonical(file1Path, file2Path);
     }
 }
