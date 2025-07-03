@@ -197,29 +197,12 @@ public class StreamingXMLComparator {
     
     /**
      * Compare two XML files using canonical (order-agnostic) comparison
-<<<<<<< HEAD
-     * Based on the existing XMLDataConverter logic but using StAX for memory efficiency
-=======
      * For large files, we'll use a simplified approach that normalizes content
->>>>>>> mcp-semantic-comparison
      */
     public static boolean compareXMLFilesCanonical(String xmlFile1, String xmlFile2) 
             throws IOException, XMLStreamException {
         logger.info("Starting StAX canonical comparison of XML files: {} and {}", xmlFile1, xmlFile2);
         
-<<<<<<< HEAD
-        // Extract normalized element structures from both files
-        List<ElementStructure> elements1 = extractElementStructures(xmlFile1);
-        List<ElementStructure> elements2 = extractElementStructures(xmlFile2);
-        
-        // Perform order-agnostic comparison
-        return compareElementStructuresCanonically(elements1, elements2);
-    }
-    
-    private static List<ElementStructure> extractElementStructures(String xmlFile) 
-            throws IOException, XMLStreamException {
-        List<ElementStructure> elements = new ArrayList<>();
-=======
         // For large files, use a hash-based approach to avoid memory issues
         String normalizedContent1 = extractNormalizedContent(xmlFile1);
         String normalizedContent2 = extractNormalizedContent(xmlFile2);
@@ -235,7 +218,6 @@ public class StreamingXMLComparator {
      */
     private static String extractNormalizedContent(String xmlFile) throws IOException, XMLStreamException {
         Map<String, List<String>> elementsByName = new HashMap<>();
->>>>>>> mcp-semantic-comparison
         XMLInputFactory factory = XMLInputFactory.newInstance();
         
         try (FileInputStream fis = new FileInputStream(xmlFile)) {
@@ -245,25 +227,15 @@ public class StreamingXMLComparator {
                 int event = reader.next();
                 
                 if (event == XMLStreamConstants.START_ELEMENT) {
-<<<<<<< HEAD
-                    ElementStructure element = parseElement(reader);
-                    if (element != null) {
-                        elements.add(element);
-                    }
-=======
                     String elementName = reader.getLocalName();
                     String elementContent = extractElementContent(reader, elementName);
                     
                     elementsByName.computeIfAbsent(elementName, k -> new ArrayList<>()).add(elementContent);
->>>>>>> mcp-semantic-comparison
                 }
             }
             reader.close();
         }
         
-<<<<<<< HEAD
-        return elements;
-=======
         // Sort elements by name and their content for consistent comparison
         StringBuilder normalized = new StringBuilder();
         elementsByName.entrySet().stream()
@@ -305,7 +277,6 @@ public class StreamingXMLComparator {
         }
         
         return content.toString();
->>>>>>> mcp-semantic-comparison
     }
     
     private static ElementStructure parseElement(XMLStreamReader reader) throws XMLStreamException {

@@ -149,16 +149,8 @@ public class XmlComparisonService {
                 result.setDifferences(List.of("Files have different semantic structure or content"));
             }
             
-<<<<<<< HEAD
-            // Generate output based on format
-            String outputPath = generateOutput(result, outputFormat, null);
-            result.setOutputFilePath(outputPath);
-            
-            // Return formatted response
-=======
             // For semantic comparison, we don't need to generate output files
             // Just return the result directly
->>>>>>> mcp-semantic-comparison
             return formatResponse(result, outputFormat);
             
         } catch (Exception e) {
@@ -406,11 +398,7 @@ public class XmlComparisonService {
     }
 
     private boolean compareXmlFilesSemantically(String file1Path, String file2Path) throws Exception {
-<<<<<<< HEAD
-        // Use StAX-based canonical comparison inspired by existing XMLDataConverter logic
-=======
         // Use StAX-based canonical comparison
->>>>>>> mcp-semantic-comparison
         return StreamingXMLComparator.compareXMLFilesCanonical(file1Path, file2Path);
     }
 }
