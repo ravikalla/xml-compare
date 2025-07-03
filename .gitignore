@@ -1,34 +1,26 @@
-# Maven build artifacts (but keep final JARs)
-target/classes/
-target/test-classes/
-target/maven-archiver/
-target/maven-status/
-target/surefire-reports/
-target/jacoco.exec
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
+# Large test files and results
+**/test-files-large/
+**/*test*.log
+**/*_log.txt
+**/*MB*.xml
+**/*MB*.txt
+complete-load-test-results/
+load-test-results/
+quick-test-results/
+enhanced-test-results/
+stax-test-results/
+simple-load-test-results/
+performance-results/
 
-# Log files
-*.log
+# Build directories
+target/
+bin/
+out/
 
-# IDE
-.vscode/
+# IDE files
 .idea/
+.vscode/
 *.iml
-*.iws
-*.ipr
 
-# OS
+# OS files
 .DS_Store
-Thumbs.db
-
-# Temporary files
-*.tmp
-*.temp
