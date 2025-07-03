@@ -4,29 +4,62 @@ A Model Context Protocol (MCP) server that provides XML file comparison function
 
 ## Features
 
-- **StAX Streaming Parser**: Memory-efficient comparison of large XML files (up to 50MB+)
-- **Multiple Output Formats**: Text, JSON, and Excel report generation
-- **File Validation**: XML well-formedness validation
-- **File Analysis**: Get detailed XML file information (size, structure, element count)
-- **MCP Integration**: Seamless integration with Claude Desktop
+- 🚀 **High Performance**: StAX streaming parser for memory-efficient processing of large XML files (tested with 60MB+ files)
+- 🔄 **Semantic Comparison**: Order-agnostic comparison that ignores element ordering for true semantic analysis
+- 📊 **Multiple Output Formats**: Support for text, JSON, and Excel output formats
+- ✅ **XML Validation**: Built-in XML file validation and detailed analysis
+- 🛡️ **Error Handling**: Comprehensive error handling with detailed error messages
+- 🎯 **String-based Processing**: All comparisons treat data as strings (no complex type conversions)
+- 🔧 **MCP Integration**: Seamless integration with Claude Desktop
 
 ## Tools Available
 
 ### 1. `compare_xml_files`
-Compare two XML files and generate results in specified format.
+Compare two XML files using sequential (order-sensitive) comparison.
 
 **Parameters:**
 - `file1Path` (required): Path to first XML file
 - `file2Path` (required): Path to second XML file  
 - `outputFormat` (required): Output format - "text", "json", or "excel"
-- `customOutputPath` (optional): Custom output file path
 
 **Example Usage:**
 ```
 Compare the XML files /path/to/file1.xml and /path/to/file2.xml in JSON format
 ```
 
-### 2. `validate_xml_file`
+### 2. `compare_xml_files_semantic`
+Compare two XML files using semantic (order-agnostic) comparison that ignores element ordering.
+
+**Parameters:**
+- `file1Path` (required): Path to first XML file
+- `file2Path` (required): Path to second XML file  
+- `outputFormat` (required): Output format - "text", "json", or "excel"
+
+**Example Usage:**
+```
+Compare these XML files semantically (ignoring element order) in JSON format:
+- /path/to/file1.xml and /path/to/file2.xml
+```
+
+### 3. `compare_xml_files_custom_path`
+Compare XML files with a custom output file path.
+
+**Parameters:**
+- `file1Path` (required): Path to first XML file
+- `file2Path` (required): Path to second XML file  
+- `outputFormat` (required): Output format - "text", "json", or "excel"
+- `customOutputPath` (required): Custom path for output file
+
+**Example Usage:**
+```
+Compare XML files and save the report to a specific location:
+- file1Path: /path/to/file1.xml
+- file2Path: /path/to/file2.xml
+- outputFormat: text
+- customOutputPath: /path/to/my_report.txt
+```
+
+### 4. `validate_xml_file`
 Validate if a file is well-formed XML.
 
 **Parameters:**
@@ -37,7 +70,7 @@ Validate if a file is well-formed XML.
 Validate the XML file /path/to/myfile.xml
 ```
 
-### 3. `get_xml_file_info`
+### 5. `get_xml_file_info`
 Get detailed information about an XML file.
 
 **Parameters:**
@@ -92,11 +125,19 @@ Get information about the XML file /path/to/myfile.xml
 
 Once configured, you can use natural language with Claude to compare XML files:
 
-### Basic Comparison
+### Basic XML Comparison
 ```
 Compare these two XML files and show me the differences in text format:
 - /Users/myuser/file1.xml
 - /Users/myuser/file2.xml
+```
+
+### Semantic (Order-Agnostic) Comparison
+```
+Compare these XML files semantically, ignoring element order:
+- /path/to/config1.xml
+- /path/to/config2.xml
+Output format: JSON
 ```
 
 ### JSON Output

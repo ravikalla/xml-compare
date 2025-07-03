@@ -1,0 +1,76 @@
+{
+  "name": "xml-comparison-mcp-server",
+  "version": "1.0.0",
+  "description": "A Model Context Protocol server for XML file comparison with semantic analysis capabilities",
+  "keywords": [
+    "mcp",
+    "xml",
+    "comparison",
+    "diff",
+    "semantic",
+    "stax",
+    "streaming",
+    "large-files",
+    "order-agnostic"
+  ],
+  "author": "Ravi Kalla",
+  "license": "MIT",
+  "homepage": "https://github.com/ravikalla/xml-compare",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ravikalla/xml-compare.git",
+    "directory": "mcp-xml-comparison"
+  },
+  "bugs": {
+    "url": "https://github.com/ravikalla/xml-compare/issues"
+  },
+  "mcp": {
+    "server": {
+      "name": "xml-comparison",
+      "description": "High-performance XML file comparison with semantic analysis",
+      "version": "1.0.0",
+      "tools": [
+        {
+          "name": "compare_xml_files",
+          "description": "Compare two XML files using sequential (order-sensitive) comparison"
+        },
+        {
+          "name": "compare_xml_files_semantic", 
+          "description": "Compare two XML files using semantic (order-agnostic) comparison"
+        },
+        {
+          "name": "compare_xml_files_custom_path",
+          "description": "Compare XML files with custom output path"
+        },
+        {
+          "name": "validate_xml_file",
+          "description": "Validate XML file for well-formedness"
+        },
+        {
+          "name": "get_xml_file_info",
+          "description": "Get detailed XML file information and analysis"
+        }
+      ],
+      "requirements": {
+        "java": "17+",
+        "maven": "3.6+"
+      },
+      "installation": {
+        "build": [
+          "git clone https://github.com/ravikalla/xml-compare.git",
+          "cd xml-compare/mcp-xml-comparison", 
+          "mvn clean package -DskipTests"
+        ],
+        "run": "java -jar target/xml-comparison-1.0.0.jar"
+      },
+      "features": [
+        "Memory-efficient StAX streaming parser",
+        "Supports large XML files (60MB+ tested)",
+        "Order-agnostic semantic comparison",
+        "Multiple output formats (text, JSON, Excel)",
+        "String-based processing (no type conversion)",
+        "Comprehensive error handling"
+      ]
+    }
+  }
+}
