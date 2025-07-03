@@ -31,23 +31,12 @@ package in.ravikalla.xml_compare;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.xml.sax.SAXException;
 
-import in.ravikalla.xml_compare.dto.XMLToXMLComparisonResultsHolderDTO;
-import in.ravikalla.xml_compare.util.CommonUtil;
-import in.ravikalla.xml_compare.util.ConvertXMLToFullPathInCSV;
-import in.ravikalla.xml_compare.util.FileUtil;
-import in.ravikalla.xml_compare.util.ParameterLogger;
-import in.ravikalla.xml_compare.util.XMLDataConverter;
+import in.ravikalla.xml_compare.util.StreamingXMLComparator;
 import in.ravikalla.xml_compare.util.ValidationUtil;
-import in.ravikalla.xml_compare.util.XmlProcessor;
 
 /**
  * 
@@ -126,69 +115,14 @@ public class CompareXMLAndXML {
 			String strExcludeElementsFileName, String strIterateElementsFileName, String strComparisonResultsFile,
 			String strTrimElements) throws IOException {
 		logger.debug("Start : CompareXMLAndXML.testCompareXMLAndXMLWriteResults()" + strXMLFileName1 + " : " + strXMLFileName2);
-		String xmlStr1 = CommonUtil.readDataFromFile(strXMLFileName1);
-		String xmlStr2 = CommonUtil.readDataFromFile(strXMLFileName2);
-		List<String> lstElementsToExclude = FileUtil.readTextFileToList(strExcludeElementsFileName);
-		List<String> lstIterativeElements = null;
-		String strPrimaryNodeXMLElementName = null;
-		if (null != strIterateElementsFileName)
-			lstIterativeElements = FileUtil.readTextFileToList(strIterateElementsFileName);
-		else
-			lstIterativeElements = ConvertXMLToFullPathInCSV.getFirstLevelOfReapeatingElements(xmlStr1, xmlStr2);
-
-		xmlStr1 = XmlProcessor.replaceEscapeCharacters(xmlStr1);
-		xmlStr2 = XmlProcessor.replaceEscapeCharacters(xmlStr2);
-
-		boolean testResult = CompareXMLAndXML.compareXMLAndXMLWriteResults(
-				strComparisonResultsFile, xmlStr1, xmlStr2,
-				lstIterativeElements, lstElementsToExclude,
-				strPrimaryNodeXMLElementName, strTrimElements
-				);
-		logger.debug("End : CompareXMLAndXML.testCompareXMLAndXMLWriteResults()" + strXMLFileName1 + " : " + strXMLFileName2 + " : " + testResult);
-		return testResult;
-	}
-	private static boolean compareXMLAndXMLWriteResults(String strComparisonResultsFile, String xmlStr1,
-			String xmlStr2, List<String> lstIterativeElements, List<String> lstElementsToExclude,
-			String strPrimaryNodeXMLElementName, String strTrimElements) {
-		ParameterLogger.logComparisonParameters(strComparisonResultsFile, xmlStr1,
-				xmlStr2, lstIterativeElements, lstElementsToExclude,
-				strPrimaryNodeXMLElementName, strTrimElements);
-
-		boolean blnDifferencesExists = false;
-
+		
+		// Use StAX streaming approach consistently for all file sizes
+		logger.info("Using StAX streaming comparison approach for all files.");
 		try {
-			logger.debug("Iterative elements length : " + lstIterativeElements.size());
-			XMLToXMLComparisonResultsHolderDTO objXMLToXMLComparisonResultsHolderDTO = null;
-			List<String> lstMatchedDataForCSV = new ArrayList<String>();
-			List<String> lstMismatchedDataForCSV = new ArrayList<String>();
-			lstMatchedDataForCSV.add("Expected XPath,Expected Data,Actual Data");
-			lstMismatchedDataForCSV.add("Expected XPath,Expected Data,Actual Path,Actual Data");
-
-			for (int intCtr = 0; intCtr < lstIterativeElements.size(); intCtr++) {
-				String strIterationElement = lstIterativeElements.get(intCtr);
-				if (!"".equals(strIterationElement)) {
-					objXMLToXMLComparisonResultsHolderDTO = XMLDataConverter
-							.compXPathEleDataWithChildEle(
-									xmlStr1, xmlStr2,
-									lstIterativeElements.get(intCtr),
-									lstElementsToExclude,
-									strPrimaryNodeXMLElementName,
-									strTrimElements);
-					lstMatchedDataForCSV.addAll(objXMLToXMLComparisonResultsHolderDTO.lstMatchedDataForCSV);
-					lstMismatchedDataForCSV.addAll(objXMLToXMLComparisonResultsHolderDTO.lstMismatchedDataForCSV);
-				}
-			}
-			logger.debug("Mismatched data size : " + lstMismatchedDataForCSV.size());
-			if (lstMismatchedDataForCSV.size() > 1)
-				blnDifferencesExists = true;
-			XMLDataConverter.printResultsToFile(strComparisonResultsFile, lstMatchedDataForCSV, lstMismatchedDataForCSV);
-		} catch (SAXException e) {
-			logger.error("79 : CompareXMLAndXML.CompareXMLAndXMLWriteResults(...) : SAXException e : " + e);
-		} catch (IOException e) {
-			logger.error("81 : CompareXMLAndXML.CompareXMLAndXMLWriteResults(...) : IOException e : " + e);
-		} catch (ParserConfigurationException e) {
-			logger.error("83 : CompareXMLAndXML.CompareXMLAndXMLWriteResults(...) : ParserConfigurationException e : " + e);
+			return StreamingXMLComparator.compareXMLFilesStreaming(strXMLFileName1, strXMLFileName2, strComparisonResultsFile);
+		} catch (Exception e) {
+			logger.error("StAX streaming comparison failed: " + e.getMessage(), e);
+			throw new IOException("XML comparison failed: " + e.getMessage(), e);
 		}
-		return !blnDifferencesExists;
 	}
 }
