@@ -149,11 +149,8 @@ public class XmlComparisonService {
                 result.setDifferences(List.of("Files have different semantic structure or content"));
             }
             
-            // Generate output based on format
-            String outputPath = generateOutput(result, outputFormat, null);
-            result.setOutputFilePath(outputPath);
-            
-            // Return formatted response
+            // For semantic comparison, we don't need to generate output files
+            // Just return the result directly
             return formatResponse(result, outputFormat);
             
         } catch (Exception e) {

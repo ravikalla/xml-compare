@@ -3,6 +3,7 @@ package com.ravikalla.xmlcomparison.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -18,12 +19,12 @@ public class ComparisonResult {
     private List<String> differences;
     private int differenceCount;
     private long comparisonDurationMs;
-    private LocalDateTime comparisonTimestamp;
+    private String comparisonTimestamp;
     private String status;
     private String errorMessage;
     
     public ComparisonResult() {
-        this.comparisonTimestamp = LocalDateTime.now();
+        this.comparisonTimestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         this.status = "SUCCESS";
     }
     
@@ -116,11 +117,11 @@ public class ComparisonResult {
         this.comparisonDurationMs = comparisonDurationMs;
     }
 
-    public LocalDateTime getComparisonTimestamp() {
+    public String getComparisonTimestamp() {
         return comparisonTimestamp;
     }
 
-    public void setComparisonTimestamp(LocalDateTime comparisonTimestamp) {
+    public void setComparisonTimestamp(String comparisonTimestamp) {
         this.comparisonTimestamp = comparisonTimestamp;
     }
 

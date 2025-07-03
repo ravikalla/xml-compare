@@ -197,23 +197,27 @@ public class StreamingXMLComparator {
     
     /**
      * Compare two XML files using canonical (order-agnostic) comparison
-     * Based on the existing XMLDataConverter logic but using StAX for memory efficiency
+     * For large files, we'll use a simplified approach that normalizes content
      */
     public static boolean compareXMLFilesCanonical(String xmlFile1, String xmlFile2) 
             throws IOException, XMLStreamException {
         logger.info("Starting StAX canonical comparison of XML files: {} and {}", xmlFile1, xmlFile2);
         
-        // Extract normalized element structures from both files
-        List<ElementStructure> elements1 = extractElementStructures(xmlFile1);
-        List<ElementStructure> elements2 = extractElementStructures(xmlFile2);
+        // For large files, use a hash-based approach to avoid memory issues
+        String normalizedContent1 = extractNormalizedContent(xmlFile1);
+        String normalizedContent2 = extractNormalizedContent(xmlFile2);
         
-        // Perform order-agnostic comparison
-        return compareElementStructuresCanonically(elements1, elements2);
+        boolean result = normalizedContent1.equals(normalizedContent2);
+        logger.info("Canonical comparison completed. Files match: {}", result);
+        return result;
     }
     
-    private static List<ElementStructure> extractElementStructures(String xmlFile) 
-            throws IOException, XMLStreamException {
-        List<ElementStructure> elements = new ArrayList<>();
+    /**
+     * Extract normalized content from XML file for semantic comparison
+     * This approach sorts element content to make comparison order-agnostic
+     */
+    private static String extractNormalizedContent(String xmlFile) throws IOException, XMLStreamException {
+        Map<String, List<String>> elementsByName = new HashMap<>();
         XMLInputFactory factory = XMLInputFactory.newInstance();
         
         try (FileInputStream fis = new FileInputStream(xmlFile)) {
@@ -223,16 +227,56 @@ public class StreamingXMLComparator {
                 int event = reader.next();
                 
                 if (event == XMLStreamConstants.START_ELEMENT) {
-                    ElementStructure element = parseElement(reader);
-                    if (element != null) {
-                        elements.add(element);
-                    }
+                    String elementName = reader.getLocalName();
+                    String elementContent = extractElementContent(reader, elementName);
+                    
+                    elementsByName.computeIfAbsent(elementName, k -> new ArrayList<>()).add(elementContent);
                 }
             }
             reader.close();
         }
         
-        return elements;
+        // Sort elements by name and their content for consistent comparison
+        StringBuilder normalized = new StringBuilder();
+        elementsByName.entrySet().stream()
+            .sorted(Map.Entry.comparingByKey())
+            .forEach(entry -> {
+                entry.getValue().sort(String::compareTo);
+                normalized.append(entry.getKey()).append(":");
+                entry.getValue().forEach(content -> normalized.append(content).append("|"));
+                normalized.append(";");
+            });
+        
+        return normalized.toString();
+    }
+    
+    private static String extractElementContent(XMLStreamReader reader, String elementName) throws XMLStreamException {
+        StringBuilder content = new StringBuilder();
+        content.append(elementName).append("(");
+        
+        // Add attributes
+        for (int i = 0; i < reader.getAttributeCount(); i++) {
+            content.append(reader.getAttributeLocalName(i)).append("=")
+                   .append(reader.getAttributeValue(i)).append(",");
+        }
+        content.append(")");
+        
+        // Add text content
+        while (reader.hasNext()) {
+            int event = reader.next();
+            
+            if (event == XMLStreamConstants.CHARACTERS) {
+                String text = reader.getText().trim();
+                if (!text.isEmpty()) {
+                    content.append(text);
+                }
+            } else if (event == XMLStreamConstants.END_ELEMENT && 
+                      reader.getLocalName().equals(elementName)) {
+                break;
+            }
+        }
+        
+        return content.toString();
     }
     
     private static ElementStructure parseElement(XMLStreamReader reader) throws XMLStreamException {

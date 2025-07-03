@@ -1,5 +1,7 @@
 package com.ravikalla.xmlcomparison;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ravikalla.xmlcomparison.service.XmlComparisonService;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbacks;
@@ -19,6 +21,13 @@ public class XmlComparisonMcpApplication {
     @Bean
     public List<ToolCallback> xmlComparisonTools(XmlComparisonService xmlComparisonService) {
         return List.of(ToolCallbacks.from(xmlComparisonService));
+    }
+    
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mapper;
     }
 
 }
