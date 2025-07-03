@@ -110,6 +110,58 @@ public class XmlComparisonService {
         }
     }
 
+    @Tool(name = "compare_xml_files_semantic", description = "Compare two XML files semantically (ignores element order) and return results in specified format (text, json, excel)")
+    public String compareXmlFilesSemantic(String file1Path, String file2Path, String outputFormat) {
+        logger.info("Comparing XML files semantically: {} vs {} with output format: {}", file1Path, file2Path, outputFormat);
+        
+        try {
+            // Validate input parameters
+            if (!isValidOutputFormat(outputFormat)) {
+                return createErrorResponse("Invalid output format. Supported formats: text, json, excel");
+            }
+            
+            if (!Files.exists(Paths.get(file1Path))) {
+                return createErrorResponse("File 1 does not exist: " + file1Path);
+            }
+            
+            if (!Files.exists(Paths.get(file2Path))) {
+                return createErrorResponse("File 2 does not exist: " + file2Path);
+            }
+            
+            // Perform semantic comparison
+            long startTime = System.currentTimeMillis();
+            boolean filesMatch = compareXmlFilesSemantically(file1Path, file2Path);
+            long duration = System.currentTimeMillis() - startTime;
+            
+            // Create comparison result
+            ComparisonResult result = new ComparisonResult();
+            result.setFile1Path(file1Path);
+            result.setFile2Path(file2Path);
+            result.setFile1Size(Files.size(Paths.get(file1Path)));
+            result.setFile2Size(Files.size(Paths.get(file2Path)));
+            result.setFilesMatch(filesMatch);
+            result.setComparisonDurationMs(duration);
+            result.setOutputFormat(outputFormat);
+            
+            if (filesMatch) {
+                result.setDifferences(List.of("No semantic differences found - files are structurally equivalent"));
+            } else {
+                result.setDifferences(List.of("Files have different semantic structure or content"));
+            }
+            
+            // Generate output based on format
+            String outputPath = generateOutput(result, outputFormat, null);
+            result.setOutputFilePath(outputPath);
+            
+            // Return formatted response
+            return formatResponse(result, outputFormat);
+            
+        } catch (Exception e) {
+            logger.error("Error comparing XML files semantically: {}", e.getMessage(), e);
+            return createErrorResponse("Semantic comparison failed: " + e.getMessage());
+        }
+    }
+
     private boolean isValidOutputFormat(String format) {
         return format != null && 
                (format.equalsIgnoreCase("text") || 
@@ -346,5 +398,10 @@ public class XmlComparisonService {
         if (bytes < 1024 * 1024) return String.format("%.1f KB", bytes / 1024.0);
         if (bytes < 1024 * 1024 * 1024) return String.format("%.1f MB", bytes / (1024.0 * 1024.0));
         return String.format("%.1f GB", bytes / (1024.0 * 1024.0 * 1024.0));
+    }
+
+    private boolean compareXmlFilesSemantically(String file1Path, String file2Path) throws Exception {
+        // Use StAX-based canonical comparison
+        return StreamingXMLComparator.compareXMLFilesCanonical(file1Path, file2Path);
     }
 }
