@@ -1,0 +1,20 @@
+XML Comparison Report
+====================
+
+Comparison Timestamp: 2025-07-03T13:32:52.043159
+File 1: /Users/ravikalla/Desktop/projects/xml-compare-master/test-files-large/large_60MB_1.xml (26.2 MB)
+File 2: /Users/ravikalla/Desktop/projects/xml-compare-master/test-files-large/large_60MB_2.xml (26.2 MB)
+Files Match: NO
+Comparison Duration: 502ms
+Total Differences: 8
+
+Differences Found:
+-----------------
+1. Text content mismatch at element 22: 'Student2First' vs 'Student3First'
+2. Text content mismatch at element 23: 'Student2Last' vs 'Student3Last'
+3. Text content mismatch at element 24: '10' vs '11'
+4. Text content mismatch at element 25: '15' vs '16'
+5. Text content mismatch at element 28: 'Student3First' vs 'Student2First'
+6. Text content mismatch at element 29: 'Student3Last' vs 'Student2Last'
+7. Text content mismatch at element 30: '11' vs '10'
+8. Text content mismatch at element 31: '16' vs '15'

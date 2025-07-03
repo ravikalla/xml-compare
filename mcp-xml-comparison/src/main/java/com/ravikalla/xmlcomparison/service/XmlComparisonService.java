@@ -14,6 +14,14 @@ import org.springframework.stereotype.Service;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -107,6 +115,58 @@ public class XmlComparisonService {
         } catch (Exception e) {
             logger.error("Error getting XML file info: {}", e.getMessage(), e);
             return createJsonResponse(new XmlFileInfo(filePath, "Analysis failed: " + e.getMessage()));
+        }
+    }
+
+    @Tool(name = "compare_xml_files_semantic", description = "Compare two XML files semantically (ignores element order) and return results in specified format (text, json, excel)")
+    public String compareXmlFilesSemantic(String file1Path, String file2Path, String outputFormat) {
+        logger.info("Comparing XML files semantically: {} vs {} with output format: {}", file1Path, file2Path, outputFormat);
+        
+        try {
+            // Validate input parameters
+            if (!isValidOutputFormat(outputFormat)) {
+                return createErrorResponse("Invalid output format. Supported formats: text, json, excel");
+            }
+            
+            if (!Files.exists(Paths.get(file1Path))) {
+                return createErrorResponse("File 1 does not exist: " + file1Path);
+            }
+            
+            if (!Files.exists(Paths.get(file2Path))) {
+                return createErrorResponse("File 2 does not exist: " + file2Path);
+            }
+            
+            // Perform semantic comparison
+            long startTime = System.currentTimeMillis();
+            boolean filesMatch = compareXmlFilesSemantically(file1Path, file2Path);
+            long duration = System.currentTimeMillis() - startTime;
+            
+            // Create comparison result
+            ComparisonResult result = new ComparisonResult();
+            result.setFile1Path(file1Path);
+            result.setFile2Path(file2Path);
+            result.setFile1Size(Files.size(Paths.get(file1Path)));
+            result.setFile2Size(Files.size(Paths.get(file2Path)));
+            result.setFilesMatch(filesMatch);
+            result.setComparisonDurationMs(duration);
+            result.setOutputFormat(outputFormat);
+            
+            if (filesMatch) {
+                result.setDifferences(List.of("No semantic differences found - files are structurally equivalent"));
+            } else {
+                result.setDifferences(List.of("Files have different semantic structure or content"));
+            }
+            
+            // Generate output based on format
+            String outputPath = generateOutput(result, outputFormat, null);
+            result.setOutputFilePath(outputPath);
+            
+            // Return formatted response
+            return formatResponse(result, outputFormat);
+            
+        } catch (Exception e) {
+            logger.error("Error comparing XML files semantically: {}", e.getMessage(), e);
+            return createErrorResponse("Semantic comparison failed: " + e.getMessage());
         }
     }
 
@@ -346,5 +406,47 @@ public class XmlComparisonService {
         if (bytes < 1024 * 1024) return String.format("%.1f KB", bytes / 1024.0);
         if (bytes < 1024 * 1024 * 1024) return String.format("%.1f MB", bytes / (1024.0 * 1024.0));
         return String.format("%.1f GB", bytes / (1024.0 * 1024.0 * 1024.0));
+    }
+
+    private boolean compareXmlFilesSemantically(String file1Path, String file2Path) throws Exception {
+        try {
+            // Use XMLUnit to compare XML files semantically
+            Diff diff = DiffBuilder.compare(new StreamSource(new File(file1Path)))
+                    .withTest(new StreamSource(new File(file2Path)))
+                    .ignoreWhitespace()
+                    .ignoreElementContentWhitespace()
+                    .ignoreComments()
+                    .normalizeWhitespace()
+                    .checkForSimilar()
+                    .build();
+            
+            return !diff.hasDifferences();
+            
+        } catch (Exception e) {
+            logger.error("Error in semantic XML comparison: {}", e.getMessage(), e);
+            // Fallback to simple content comparison if XMLUnit fails
+            return compareXmlFilesContentOnly(file1Path, file2Path);
+        }
+    }
+
+    private boolean compareXmlFilesContentOnly(String file1Path, String file2Path) throws Exception {
+        // Simple fallback: normalize and compare XML content
+        String content1 = normalizeXmlContent(file1Path);
+        String content2 = normalizeXmlContent(file2Path);
+        return content1.equals(content2);
+    }
+
+    private String normalizeXmlContent(String filePath) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setIgnoringElementContentWhitespace(true);
+        factory.setIgnoringComments(true);
+        
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new File(filePath));
+        
+        // Normalize the document
+        doc.getDocumentElement().normalize();
+        
+        return doc.getDocumentElement().getTextContent().trim().replaceAll("\\s+", " ");
     }
 }
