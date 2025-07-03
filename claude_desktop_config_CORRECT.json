@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "xml-comparison": {
+      "command": "java",
+      "args": [
+        "-jar",
+        "/Users/ravikalla/Desktop/projects/xml-compare-master/target/xml-comparison-1.0.0.jar"
+      ]
+    }
+  }
+}

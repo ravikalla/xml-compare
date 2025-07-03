@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Completely disable all console output -->
+    <root level="OFF">
+        <!-- No appenders defined - complete silence -->
+    </root>
+    
+    <!-- Ensure all known loggers are also silenced -->
+    <logger name="org.springframework" level="OFF" additivity="false" />
+    <logger name="org.springframework.boot" level="OFF" additivity="false" />
+    <logger name="org.springframework.ai" level="OFF" additivity="false" />
+    <logger name="com.ravikalla.xmlcomparison" level="OFF" additivity="false" />
+    <logger name="org.apache" level="OFF" additivity="false" />
+    <logger name="com.zaxxer" level="OFF" additivity="false" />
+    <logger name="ROOT" level="OFF" additivity="false" />
+</configuration>

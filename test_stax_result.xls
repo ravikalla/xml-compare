@@ -1,0 +1,7 @@
+Streaming XML Comparison Results
+================================
+
+Total differences found: 2
+
+1. Text content mismatch at element 3: '2025-07-02T14:08:18' vs '2025-07-02T14:08:19'
+2. Text content mismatch at element 5: 'test_1MB_identical_1.xml' vs 'test_1MB_identical_2.xml'
